@@ -1,0 +1,40 @@
+\section{问题分析}
+
+\subsection{数据字段与问题类型}
+题目数据同时包含类别变量和连续变量。玻璃类型、纹饰、颜色及表面风化属于类别变量；14种氧化物含量属于连续比例变量，且各成分之和应接近\(100\%\)，具有典型成分数据特征。
+
+\begin{table}[H]
+  \centering
+  \caption{各问题的类型与候选方法}
+  \label{tab:problem-type}
+  \begin{tabularx}{\textwidth}{C{1.5cm} L{3.5cm} L{5.2cm} X}
+    \toprule
+    问题 & 核心任务 & 定性筛选后的候选方法 & 选择依据 \\
+    \midrule
+    问题一 & 类别关联、分组差异、连续值恢复 & 列联分析、Fisher/卡方检验、二元逻辑回归；非参数检验；比例修正或回归 & 风化为二分类变量，化学成分为连续变量 \\
+    问题二 & 二分类与亚类划分 & 逻辑回归、LDA、决策树或SVM；层次聚类或K-means & 大类标签已知，亚类标签未知 \\
+    问题三 & 未知样品鉴别 & 复用问题二分类器，并进行概率或边界扰动分析 & 输出为高钾/铅钡二分类 \\
+    问题四 & 成分关联及类别差异 & CLR/ILR变换、Spearman/Pearson相关、差异相关分析 & 无单一因变量，且存在闭合效应 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{总体建模思路}
+总体流程如图\ref{fig:workflow}所示。首先依据成分和阈值筛除无效样本并处理未检出值；其次研究风化与文物属性及化学成分的关系；随后建立分类和聚类模型；最后对未知样品完成判别，并比较两种玻璃的成分关联结构。
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox[c][5.0cm][c]{0.88\textwidth}{\centering
+    \todo{插入建模流程图：原始数据 $\rightarrow$ 有效性检验 $\rightarrow$ 成分数据处理 $\rightarrow$ 问题一风化分析 $\rightarrow$ 问题二分类/聚类 $\rightarrow$ 问题三未知样品判别 $\rightarrow$ 问题四关联比较}
+  }}
+  \caption{总体建模流程}
+  \label{fig:workflow}
+\end{figure}
+
+\subsection{技术难点}
+\begin{enumerate}
+  \item 表单2按采样点记录，同一文物可能含多个部位或不同风化程度的采样点，样本并非完全独立。
+  \item 空白表示未检测到，而非普通意义上的随机缺失；对数比变换前不能直接保留零值。
+  \item 各成分总和受\(100\%\)闭合约束，直接计算普通相关系数可能产生伪相关。
+  \item 样本规模较小且类别不平衡，复杂模型容易过拟合，应优先选择可解释、低复杂度方法，并使用交叉验证与敏感性分析。
+\end{enumerate}

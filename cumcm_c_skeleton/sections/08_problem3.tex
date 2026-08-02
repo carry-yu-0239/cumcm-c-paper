@@ -1,0 +1,38 @@
+\section{问题三：未知类别玻璃的鉴别}
+
+\subsection{未知样品预处理}
+对表单3执行与训练数据完全一致的有效性检验、零值替代、闭合归一化、变量变换和标准化。所有预处理参数仅由已分类训练样本估计，再应用于A1--A8，避免使用未知样品信息反向影响模型。
+
+\subsection{类别预测}
+将未知样品输入问题二选定的分类器，输出预测类别、类别概率或判别距离。
+
+\begin{table}[H]
+  \centering
+  \caption{未知样品类别鉴别结果}
+  \label{tab:unknown-result}
+  \small
+  \begin{tabularx}{\textwidth}{C{1.2cm} C{2.2cm} C{2.2cm} Y C{2.0cm}}
+    \toprule
+    样品 & 风化状态 & 预测类型 & 属于铅钡的概率或判别得分 & 稳定性 \\
+    \midrule
+    A1 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A2 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A3 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A4 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A5 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A6 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A7 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    A8 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{分类敏感性分析}
+对每个未知样品的成分进行多次小幅扰动，并在每次扰动后重新执行完整预处理与分类。定义样品\(i\)的稳定率为
+\begin{equation}
+  S_i=\frac{1}{B}\sum_{b=1}^{B}
+  I\!\left(\hat{T}_i^{(b)}=\hat{T}_i^{(0)}\right),
+\end{equation}
+其中\(B\)为扰动次数。若\(S_i\)较低或预测概率接近阈值，则将该样品标记为边界样品，并重点讨论其不确定性。
+
+同时比较逻辑回归、LDA、决策树或SVM等候选模型对A1--A8的预测一致性。\todo{列出发生分歧的样品及原因。}

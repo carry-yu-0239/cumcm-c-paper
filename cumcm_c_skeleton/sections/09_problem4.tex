@@ -1,0 +1,39 @@
+\section{问题四：化学成分关联关系及类别差异}
+
+\subsection{成分数据的闭合效应}
+由于14种成分之和接近\(100\%\)，一个成分比例上升会被动压缩其他成分比例，直接相关分析可能产生伪相关。因此，在零值替代和闭合归一化后，优先使用中心化对数比变换：
+\begin{equation}
+  \operatorname{clr}(c_{ij})
+  =\ln\frac{c_{ij}}{g(\bm{c}_i)},\qquad
+  g(\bm{c}_i)=\left(\prod_{j=1}^{D}c_{ij}\right)^{1/D}.
+\end{equation}
+
+\subsection{分类型关联分析}
+分别对高钾玻璃和铅钡玻璃计算CLR变量之间的Pearson相关系数，并以Spearman相关系数作为稳健性对照。对检出率极低或近零方差成分不进行强行解释。
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.47\textwidth}
+    \centering
+    \fbox{\parbox[c][5.0cm][c]{0.9\linewidth}{\centering\todo{高钾玻璃相关热力图}}}
+    \caption{高钾玻璃}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.47\textwidth}
+    \centering
+    \fbox{\parbox[c][5.0cm][c]{0.9\linewidth}{\centering\todo{铅钡玻璃相关热力图}}}
+    \caption{铅钡玻璃}
+  \end{subfigure}
+  \caption{不同玻璃类型的成分关联结构}
+  \label{fig:corr-heatmap}
+\end{figure}
+
+\subsection{两类玻璃关联差异比较}
+对每对成分\((j,k)\)，定义相关差异
+\begin{equation}
+  \Delta r_{jk}=r_{jk}^{(\mathrm{高钾})}-r_{jk}^{(\mathrm{铅钡})}.
+\end{equation}
+通过Fisher \(z\)变换或自助法构造差异置信区间，筛选在两类玻璃中方向相反或强度差异显著的成分对。重点报告少量稳定且具有配方或风化解释的关联，而不是机械罗列全部\(91\)组成分对。
+
+\subsection{结果解释}
+\todo{总结两类玻璃最强的正、负关联；列出差异最大的成分对；结合助熔剂、稳定剂及风化过程解释差异，同时明确相关关系不等于因果关系。}

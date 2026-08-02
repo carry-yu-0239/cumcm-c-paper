@@ -1,0 +1,28 @@
+\section{模型检验与稳健性分析}
+
+\subsection{分类模型检验}
+采用按文物编号分组的分层交叉验证，保证同一文物的多个采样点不会同时出现在训练集和测试集中。报告混淆矩阵、平衡准确率、宏平均F1值、灵敏度、特异度及ROC--AUC。
+
+\subsection{恢复模型检验}
+若存在可用的未风化点或模拟留出样本，则报告平均绝对误差、均方根误差及成分和偏差：
+\begin{align}
+  \mathrm{MAE} &= \frac{1}{nD}\sum_{i=1}^n\sum_{j=1}^D
+  \left|x_{ij}^{(0)}-\hat{x}_{ij}^{(0)}\right|,\\
+  \mathrm{RMSE} &= \sqrt{\frac{1}{nD}\sum_{i=1}^n\sum_{j=1}^D
+  \left(x_{ij}^{(0)}-\hat{x}_{ij}^{(0)}\right)^2}.
+\end{align}
+同时检查恢复后各成分是否非负、总和是否接近\(100\%\)。
+
+\subsection{关键假设敏感性}
+至少比较以下设定：
+\begin{enumerate}
+  \item 有效样本阈值和归一化方法；
+  \item 零值替代量；
+  \item 是否合并同一文物的普通部位；
+  \item 是否对风化样品先恢复再分类；
+  \item 分类器、聚类算法和聚类数；
+  \item 输入成分的随机扰动幅度。
+\end{enumerate}
+
+\subsection{误差来源}
+\todo{分析检测误差、未观测埋藏环境、样本量小、类别不平衡、风化点配对不足及成分闭合约束等误差来源。}

@@ -1,0 +1,58 @@
+\section{问题一：表面风化规律与风化前成分预测}
+
+\subsection{风化与玻璃类型、纹饰和颜色的关系}
+
+\subsubsection{列联表与独立性检验}
+分别构造“风化状态—玻璃类型”“风化状态—纹饰”“风化状态—颜色”列联表。对于期望频数充分的列联表使用Pearson卡方检验；当存在较多小期望频数时，使用Fisher精确检验或Monte Carlo精确检验。
+
+设列联表观测频数为\(O_{ab}\)，期望频数为\(E_{ab}\)，卡方统计量为
+\begin{equation}
+  \chi^2=\sum_a\sum_b\frac{(O_{ab}-E_{ab})^2}{E_{ab}}.
+\end{equation}
+检验原假设为“两个类别变量相互独立”。同时报告Cramér's \(V\)作为效应量，避免只依据\(p\)值判断关系强弱。
+
+\subsubsection{二元逻辑回归}
+为同时控制多种属性，建立风化概率模型：
+\begin{equation}
+  \log\frac{P(W_i=1)}{1-P(W_i=1)}
+  =\beta_0+\beta_1T_i+\bm{\beta}_2^{\mathsf T}\bm{D}_{i,\mathrm{纹饰}}
+  +\bm{\beta}_3^{\mathsf T}\bm{D}_{i,\mathrm{颜色}},
+\end{equation}
+其中分类变量采用哑变量编码。\todo{根据样本稀疏程度决定是否合并低频颜色，或采用Firth逻辑回归降低完全分离偏差。}
+
+\subsection{分类型的风化成分统计规律}
+分别在高钾玻璃和铅钡玻璃内部比较风化组与无风化组。对每种成分报告样本量、均值、标准差、中位数和四分位距。根据正态性、异常值及方差齐性检验选择独立样本\(t\)检验或Mann--Whitney \(U\)检验，并采用\todo{Benjamini--Hochberg等方法}控制14次重复检验的多重比较错误率。
+
+定义第\(g\)类玻璃中成分\(j\)的风化变化比：
+\begin{equation}
+  q_{gj}=\frac{\operatorname{Med}(x_j\mid W=1,T=g)}
+  {\operatorname{Med}(x_j\mid W=0,T=g)}.
+\end{equation}
+当\(q_{gj}>1\)时，表示该成分在比例意义上随风化相对升高；反之相对降低。需强调，该指标描述的是成分比例变化，而非元素绝对质量变化。
+
+\subsection{风化前化学成分预测模型}
+
+\subsubsection{基准比例恢复模型}
+若配对样本有限，可先依据同类型风化组和无风化组的稳健中心构造恢复因子：
+\begin{equation}
+  a_{gj}=\frac{\operatorname{Med}(x_j\mid W=0,T=g)}
+  {\operatorname{Med}(x_j\mid W=1,T=g)+\varepsilon},
+\end{equation}
+并对风化点进行初步恢复：
+\begin{equation}
+  \tilde{x}_{ij}^{(0)}=a_{g j}x_{ij}^{(w)},\qquad
+  \hat{x}_{ij}^{(0)}=100\frac{\tilde{x}_{ij}^{(0)}}{\sum_k\tilde{x}_{ik}^{(0)}}.
+\end{equation}
+其中\(\varepsilon\)用于避免分母为0。
+
+\subsubsection{候选回归模型}
+若可构造足够可靠的配对或近似配对样本，则比较以下方案：
+\begin{itemize}
+  \item 分成分稳健线性回归；
+  \item 偏最小二乘回归，缓解成分间共线性；
+  \item 简单树模型作为非线性对照，但限制深度以防过拟合。
+\end{itemize}
+模型以按文物分组的交叉验证误差、成分和约束满足度及解释性为选择标准。
+
+\subsection{结果与解释}
+\todo{填入风化关联检验表、关键成分变化表、风化前预测结果表和误差指标。解释时区分“统计显著”“效应大小”“化学意义”三个层次。}

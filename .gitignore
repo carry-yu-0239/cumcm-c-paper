@@ -1,0 +1,26 @@
+# LaTeX intermediate files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# minted temporary directories
+_minted-*
+
+# Generated paper PDF; tracked PDFs in question/ and figures/ remain available.
+/cumcm_c_skeleton/main.pdf
+
+# Editor files
+.vscode/
+.idea/
+*.swp
