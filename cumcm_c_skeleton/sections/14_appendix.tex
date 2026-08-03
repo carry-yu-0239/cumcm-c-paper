@@ -1,9 +1,9 @@
-\section{支撑材料文件列表}
+\section{支持材料文件列表}
 
-依据竞赛格式规范，附录应列明支撑材料文件，并提交全部完整、可运行的源程序。交稿前将下表替换为实际文件名，确保论文结果可由相应程序复现。
+依据竞赛格式规范，附录列明支持材料文件，并提交全部完整、可运行的源程序。数据预处理采用 MATLAB R2025b 主计算、R 4.6.1 独立复核；Python 仅检查工作簿结构与图形文件。
 
 \begin{longtable}{C{1.2cm} L{5.2cm} L{7.0cm}}
-  \caption{支撑材料文件列表}\label{tab:support-files}\\
+  \caption{支持材料文件列表}\label{tab:support-files}\\
   \toprule
   序号 & 文件名 & 内容说明 \\
   \midrule
@@ -13,21 +13,24 @@
   序号 & 文件名 & 内容说明 \\
   \midrule
   \endhead
-  1 & \texttt{code/01\_preprocess.py} & 数据读取、有效性检验、空白值处理、表单关联与输出清洗数据 \\
-  2 & \texttt{code/02\_problem1.py} & 风化关联检验、成分差异分析与风化前成分预测 \\
-  3 & \texttt{code/03\_problem2.py} & 类型分类、特征筛选、亚类聚类及敏感性分析 \\
-  4 & \texttt{code/04\_problem3.py} & A1--A8未知样品鉴别与扰动稳定性分析 \\
-  5 & \texttt{code/05\_problem4.py} & 成分数据变换、相关分析与类别差异比较 \\
-  6 & \texttt{data/processed.xlsx} & 程序生成的清洗后数据及关键中间结果 \\
-  7 & \texttt{figures/} & 正文所用图形的可复现输出 \\
+  1 & \texttt{code/01\_preprocess.m} & MATLAB主程序源代码：有效性筛选、颜色填补、闭合、近零替换、CLR、异常诊断及全部输出 \\
+  2 & \texttt{code/preprocess.m} & MATLAB可执行入口；与01号主程序内容同步，规避MATLAB对数字开头脚本名的\texttt{run}限制 \\
+  3 & \texttt{code/02\_verify\_preprocess.R} & R独立复算有效性、闭合、近零替换和CLR，并与MATLAB结果比对 \\
+  4 & \texttt{code/03\_verify\_workbook.py} & XLSX工作表结构及PDF图形签名检查，不参与数值计算 \\
+  5 & \texttt{data/附件\_数据预处理结果.xlsx} & 清洗记录、颜色填补、CLR及异常诊断等完整中间数据 \\
+  6 & \texttt{data/verification\_snapshots/} & MATLAB读取原始工作簿后导出的三份CSV核验快照及关键结果快照 \\
+  7 & \texttt{data/matlab\_preprocess\_summary.txt} & MATLAB运行摘要与样本计数日志 \\
+  8 & \texttt{data/r\_preprocess\_consistency\_report.txt} & R与MATLAB数值一致性报告 \\
+  9 & \texttt{figures/data\_preprocess\_flow.pdf} & 数据预处理流程图 \\
+  10 & \texttt{figures/data\_preprocess\_diagnostics.pdf} & 成分和有效性与未检出率组合诊断图 \\
   \bottomrule
 \end{longtable}
 
 \section{完整程序代码}
-电子论文附录中可根据篇幅列出核心代码，完整可运行代码必须放入支撑材料压缩包。不得只提供不可运行的代码片段，也不得出现学校、姓名、学号、赛区等身份信息。
+电子论文附录中可根据篇幅列出核心代码，完整可运行代码必须随支持材料提交，且不得包含学校、姓名、学号、赛区等身份信息。
 
 \subsection{数据预处理程序}
-\todo{粘贴完整代码，或注明“完整程序见支撑材料文件\texttt{code/01\_preprocess.py}”。按赛区要求决定是否全文打印。}
+完整主程序源代码见\texttt{code/01\_preprocess.m}，实际运行入口为\texttt{code/preprocess.m}；独立复核程序见\texttt{code/02\_verify\_preprocess.R}；工作簿与图形结构检查程序见\texttt{code/03\_verify\_workbook.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
 
 \subsection{各问题求解程序}
-\todo{依次列出问题一至问题四程序及运行说明。}
+问题一至问题四的求解程序在其完成后另列入本表，并与相应的输入、输出和运行说明一并提交。

@@ -1,0 +1,5 @@
+MATLAB preprocessing: PASS
+Artifacts=58; raw points=69; valid points=67; unknown=8.
+Invalid chemistry: 15=79.47, 17=71.89. Undetected valid cells=317 (33.80%).
+Color outputs: 19=黑(hot-deck); 40=浅蓝(type-mode-fallback); 48=浅蓝(hot-deck); 58=浅蓝(hot-deck).
+Additional robust outliers=0.

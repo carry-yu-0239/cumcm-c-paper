@@ -1,0 +1,5 @@
+R independent preprocessing verification: PASS
+Artifacts=58; raw points=69; valid=67; unknown=8.
+Invalid sums: 15=79.47; 17=71.89.
+Undetected valid cells=317 (33.80%); min positive=0.04%.
+Max MATLAB-R CLR difference=5.329e-15; replacement row-sum error=2.842e-14.
