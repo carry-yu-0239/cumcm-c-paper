@@ -1,0 +1,9 @@
+"class_name","scenario","mean_adjusted_rand_index","min_adjusted_rand_index","max_adjusted_rand_index","mean_withinss"
+"high_potassium","initialization",0.874058142133911,0.536776491540517,1,16.6480449679996
+"lead_barium","initialization",0.889393016369663,0.420774299369362,1,96.1707929696095
+"high_potassium","top4_features",1,1,1,10.711943372393
+"lead_barium","top4_features",0.667772750125691,0.667772750125691,0.667772750125691,65.6479739978698
+"high_potassium","top6_features",1,1,1,23.8253911887944
+"lead_barium","top6_features",0.893388299623538,0.893388299623538,0.893388299623538,124.972793561073
+"high_potassium","zclr_noise_sd_0.03",1,1,1,11.3315393782754
+"lead_barium","zclr_noise_sd_0.03",0.998428880204978,0.943888578749231,1,92.227513856558

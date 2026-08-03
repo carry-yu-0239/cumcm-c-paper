@@ -28,6 +28,10 @@
   13 & \texttt{data/problem1/} & 问题一的关联检验、MCMC诊断、模型准入、CLR中心、32点恢复结果和留出核验CSV \\
   14 & \texttt{code/make\_problem1\_figures.R} & 问题一图形脚本：只读取\texttt{data/problem1/}中的稳定CSV，输出中文矢量PDF和300 dpi PNG预览 \\
   15 & \texttt{figures/problem1\_*.pdf/.png} & 问题一的属性风化率、稳健中心、敏感性、三元子组成与留出案例图形 \\
+  16 & \texttt{code/run\_problem2.R} & 问题二唯一数值计算入口：按文物分组验证决策树和PLS--DA，并完成分类型K-means、VIP和敏感性计算 \\
+  17 & \texttt{data/problem2/} & 问题二输入审计、分类规则、验证指标、二维展示坐标、亚类清单、逆CLR中心、VIP、敏感性CSV及实际运行摘要 \\
+  18 & \texttt{code/make\_problem2\_figures.R} & 问题二图形脚本：只读取\texttt{data/problem2/}的稳定CSV，生成中文矢量PDF和300 dpi PNG预览 \\
+  19 & \texttt{figures/problem2\_*.pdf/.png} & 问题二的决策树、PLS--DA、聚类数诊断、K-means投影和敏感性图形 \\
   \bottomrule
 \end{longtable}
 
@@ -38,4 +42,6 @@
 完整主程序源代码见\texttt{code/preprocess.m}；独立复核程序见\texttt{code/verify\_preprocess.R}；图形脚本见\texttt{code/make\_figures.R}；工作簿与图形渲染检查程序见\texttt{code/verify\_outputs.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
 
 \subsection{各问题求解程序}
-问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。问题二至问题四的求解程序在其完成后另列入本表，并与相应的输入、输出和运行说明一并提交。
+问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。
+
+问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。

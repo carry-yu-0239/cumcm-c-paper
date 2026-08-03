@@ -1,0 +1,5 @@
+"metric","value"
+"tree_grouped_cv_best_balanced_accuracy",0.833333333333333
+"plsda_grouped_cv_balanced_accuracy",0.972222222222222
+"tree_training_balanced_accuracy",1
+"plsda_training_balanced_accuracy",1

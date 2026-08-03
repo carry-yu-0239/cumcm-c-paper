@@ -1,0 +1,15 @@
+"component_id","chemical","within_type_mad","selected_for_kmeans","selection_rank"
+"component_9","PbO",0.95304302334832,TRUE,1
+"component_10","BaO",0.93855184562209,TRUE,2
+"component_2","Na2O",0.895319134826615,TRUE,3
+"component_1","SiO2",0.841648510953759,TRUE,4
+"component_14","SO2",0.81050209391345,TRUE,5
+"component_5","MgO",0.797589209137678,FALSE,6
+"component_11","P2O5",0.737806329752413,FALSE,7
+"component_13","SnO2",0.691465684975375,FALSE,8
+"component_3","K2O",0.66062969184134,FALSE,9
+"component_7","Fe2O3",0.613982732804533,FALSE,10
+"component_8","CuO",0.56469652880065,FALSE,11
+"component_4","CaO",0.497093413684615,FALSE,12
+"component_12","SrO",0.28515106000969,FALSE,13
+"component_6","Al2O3",0.22108804768954,FALSE,14

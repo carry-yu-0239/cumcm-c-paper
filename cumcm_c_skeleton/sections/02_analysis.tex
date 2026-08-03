@@ -12,7 +12,7 @@
     问题 & 核心任务 & 定性筛选后的候选方法 & 选择依据 \\
     \midrule
     问题一 & 类别关联、分组差异、连续值恢复 & 列联分析、Fisher/卡方检验、二元逻辑回归；非参数检验；比例修正或回归 & 风化为二分类变量，化学成分为连续变量 \\
-    问题二 & 二分类与亚类划分 & 逻辑回归、LDA、决策树或SVM；层次聚类或K-means & 大类标签已知，亚类标签未知 \\
+    问题二 & 二分类与亚类划分 & 信息增益决策树、PLS--DA与分类型K-means & 大类标签已知，需给出可解释规则并识别组内组成型 \\
     问题三 & 未知样品鉴别 & 复用问题二分类器，并进行概率或边界扰动分析 & 输出为高钾/铅钡二分类 \\
     问题四 & 成分关联及类别差异 & CLR/ILR变换、Spearman/Pearson相关、差异相关分析 & 无单一因变量，且存在闭合效应 \\
     \bottomrule
@@ -24,9 +24,27 @@
 
 \begin{figure}[H]
   \centering
-  \fbox{\parbox[c][5.0cm][c]{0.88\textwidth}{\centering
-    \todo{插入建模流程图：原始数据 $\rightarrow$ 有效性检验 $\rightarrow$ 成分数据处理 $\rightarrow$ 问题一风化分析 $\rightarrow$ 问题二分类/聚类 $\rightarrow$ 问题三未知样品判别 $\rightarrow$ 问题四关联比较}
-  }}
+  \begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small, align=center},
+    data/.style={draw=black!55, rounded corners=2pt, fill=black!6, minimum width=4.0cm, minimum height=0.85cm},
+    process/.style={draw=blue!55!black, rounded corners=2pt, fill=blue!7, minimum width=4.0cm, minimum height=0.92cm},
+    task/.style={draw=orange!70!black, rounded corners=2pt, fill=orange!10, minimum width=3.75cm, minimum height=1.00cm},
+    arrow/.style={->, line width=0.75pt, draw=black!65}
+  ]
+    \node[data] (source) {附件数据\\文物属性、采样点与未知样品};
+    \node[process, below=6mm of source] (preprocess) {有效性筛选与成分数据处理\\闭合、近零替换、CLR变换};
+    \node[task, below left=9mm and 7mm of preprocess] (p1) {问题一\\风化规律与成分恢复};
+    \node[task, below right=9mm and 7mm of preprocess] (p2) {问题二\\类型判别与亚类划分};
+    \node[task, below=9mm of p1] (p4) {问题四\\两类玻璃的关联结构比较};
+    \node[task, below=9mm of p2] (p3) {问题三\\未知样品鉴别与不确定性分析};
+    \draw[arrow] (source) -- (preprocess);
+    \draw[arrow] (preprocess) -- (p1);
+    \draw[arrow] (preprocess) -- (p2);
+    \draw[arrow] (p1) -- (p4);
+    \draw[arrow] (p2) -- (p3);
+    \draw[arrow] (p2.west) to[out=180,in=0] node[above, font=\scriptsize]{分类与亚类参照} (p4.east);
+  \end{tikzpicture}
   \caption{总体建模流程}
   \label{fig:workflow}
 \end{figure}

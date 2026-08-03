@@ -33,7 +33,20 @@ matlab -batch "run('code/preprocess.m')"
 python code/verify_outputs.py
 ```
 
-MATLAB 是唯一主计算源；R 从 `question/附件.xlsx` 独立读取并复算关键结果，图形脚本仅读取清洗CSV快照。流程图由 `sections/05_data.tex` 中的 TikZ 直接生成。
+上述命令只覆盖预处理：MATLAB 是预处理的唯一主计算源；R 从 `question/附件.xlsx` 独立读取并复算关键结果，图形脚本仅读取清洗CSV快照。流程图由 `sections/05_data.tex` 中的 TikZ 直接生成。
+
+## 问题二复现
+
+问题二的数值计算与图形输出分离：前者只读取已验收的预处理快照，后者只读取前者写出的稳定CSV；两者均不改写原始附件。
+
+```bash
+cd cumcm_c_skeleton
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/run_problem2.R
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/make_problem2_figures.R
+python code/verify_outputs.py
+```
+
+数值结果写入 `data/problem2/`：其中包含分组交叉验证、决策树规则、PLS--DA得分与VIP、K-means亚类归属、二维展示坐标、CLR逆变换中心与敏感性记录。图形脚本生成 `figures/problem2_*.pdf/.png`，其中PDF为中文矢量图，PNG为300 dpi预览；`verify_outputs.py`会将PDF渲染后检查非空与尺寸。
 
 ## 交稿前检查
 
