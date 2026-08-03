@@ -1,6 +1,6 @@
 \section{支持材料文件列表}
 
-依据竞赛格式规范，附录列明支持材料文件，并提交全部完整、可运行的源程序。数据预处理采用 MATLAB R2025b 主计算、R 4.6.1 独立复核；Python 仅检查工作簿结构与图形文件。
+依据竞赛格式规范，附录列明支持材料文件，并提交全部完整、可运行的源程序。数据预处理采用 MATLAB R2025b 主计算、R 4.6.1 从原始XLSX独立复核；Python 检查工作簿结构并将统计图PDF渲染为PNG进行非空与尺寸验收。
 
 \begin{longtable}{C{1.2cm} L{5.2cm} L{7.0cm}}
   \caption{支持材料文件列表}\label{tab:support-files}\\
@@ -13,16 +13,17 @@
   序号 & 文件名 & 内容说明 \\
   \midrule
   \endhead
-  1 & \texttt{code/01\_preprocess.m} & MATLAB主程序源代码：有效性筛选、颜色填补、闭合、近零替换、CLR、异常诊断及全部输出 \\
-  2 & \texttt{code/preprocess.m} & MATLAB可执行入口；与01号主程序内容同步，规避MATLAB对数字开头脚本名的\texttt{run}限制 \\
-  3 & \texttt{code/02\_verify\_preprocess.R} & R独立复算有效性、闭合、近零替换和CLR，并与MATLAB结果比对 \\
-  4 & \texttt{code/03\_verify\_workbook.py} & XLSX工作表结构及PDF图形签名检查，不参与数值计算 \\
+  1 & \texttt{code/preprocess.m} & 唯一MATLAB主程序：有效性筛选、颜色填补、闭合、近零替换、CLR、异常诊断及数据输出 \\
+  2 & \texttt{code/verify\_preprocess.R} & R从原始XLSX独立读取并复算采样点状态、颜色填补、CLR、异常诊断与敏感性，再比对MATLAB CLR快照 \\
+  3 & \texttt{code/make\_figures.R} & 仅读取清洗后的CSV快照，生成中文矢量PDF及300 dpi预览PNG \\
+  4 & \texttt{code/verify\_outputs.py} & XLSX工作表结构检查及PDF渲染、尺寸、非空检查，不参与数值计算 \\
   5 & \texttt{data/附件\_数据预处理结果.xlsx} & 清洗记录、颜色填补、CLR及异常诊断等完整中间数据 \\
   6 & \texttt{data/verification\_snapshots/} & MATLAB读取原始工作簿后导出的三份CSV核验快照及关键结果快照 \\
   7 & \texttt{data/matlab\_preprocess\_summary.txt} & MATLAB运行摘要与样本计数日志 \\
   8 & \texttt{data/r\_preprocess\_consistency\_report.txt} & R与MATLAB数值一致性报告 \\
-  9 & \texttt{figures/data\_preprocess\_flow.pdf} & 数据预处理流程图 \\
-  10 & \texttt{figures/data\_preprocess\_diagnostics.pdf} & 成分和有效性与未检出率组合诊断图 \\
+  9 & \texttt{figures/data\_preprocess\_diagnostics.pdf} & 中文矢量的成分和有效性与未检出率组合诊断图 \\
+  10 & \texttt{figures/data\_preprocess\_diagnostics.png} & 组合诊断图的300 dpi预览图 \\
+  11 & \texttt{data/*\_report.txt} & MATLAB、R、作图和PDF渲染的可复现运行报告 \\
   \bottomrule
 \end{longtable}
 
@@ -30,7 +31,7 @@
 电子论文附录中可根据篇幅列出核心代码，完整可运行代码必须随支持材料提交，且不得包含学校、姓名、学号、赛区等身份信息。
 
 \subsection{数据预处理程序}
-完整主程序源代码见\texttt{code/01\_preprocess.m}，实际运行入口为\texttt{code/preprocess.m}；独立复核程序见\texttt{code/02\_verify\_preprocess.R}；工作簿与图形结构检查程序见\texttt{code/03\_verify\_workbook.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
+完整主程序源代码见\texttt{code/preprocess.m}；独立复核程序见\texttt{code/verify\_preprocess.R}；图形脚本见\texttt{code/make\_figures.R}；工作簿与图形渲染检查程序见\texttt{code/verify\_outputs.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
 
 \subsection{各问题求解程序}
 问题一至问题四的求解程序在其完成后另列入本表，并与相应的输入、输出和运行说明一并提交。

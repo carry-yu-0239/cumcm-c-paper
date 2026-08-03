@@ -23,9 +23,13 @@ aid=string(T1{:,1}); decor=string(T1{:,2}); typ=string(T1{:,3}); color=string(T1
 sname=string(T2{:,1}); raw=T2{:,2:15}; raw(isnan(raw))=0;
 uid=string(T3{:,1}); uw=string(T3{:,2}); uraw=T3{:,3:16}; uraw(isnan(uraw))=0;
 sid=extractBetween(sname,1,2);
+isSeverePoint=contains(sname,"严重风化点");
+isUnweatheredPoint=contains(sname,"未风化点");
+isOrdinaryPoint=~isSeverePoint & ~isUnweatheredPoint;
 ss=sum(raw,2); valid=ss>=85 & ss<=105; us=sum(uraw,2);
 assert(sum(valid)==67 && all(us>=85 & us<=105), 'Validity-screening assertion failed.');
 assert(all(ismember(["15";"17"],sid(~valid))), 'Invalid points must be 15 and 17.');
+assert(sum(isSeverePoint)==3 && sum(isUnweatheredPoint)==10, 'Unexpected point-state labels.');
 nonDetect=sum(raw(valid,:)==0,'all'); pos=raw(valid,:); pos=pos(pos>0); assert(abs(min(pos)-0.04)<1e-12, 'Minimum positive value assertion failed.');
 
 vr=raw(valid,:); closed=closure(vr); replaced=mreplace(closed,delta); Z=clr(replaced);
@@ -34,13 +38,12 @@ uclosed=closure(uraw); ureplaced=mreplace(uclosed,delta); uZ=clr(ureplaced); uzZ
 assert(all(abs(sum(closed,2)-100)<1e-10) && all(abs(sum(replaced,2)-100)<1e-10), 'Closure assertion failed.');
 
 % Artifact representative composition is used only for color imputation.
+% Point state is inferred from the complete sample name, never from artifact ID.
 rep=nan(height(T1),14);
-severeIds=["08","26","54"]; unweatheredIds=["23","25","28","29","42","44","49","50","53"];
 for i=1:height(T1)
     ix=valid & sid==aid(i);
     if any(ix)
-        nms=sname(ix); x=raw(ix,:); ids=sid(ix);
-        severe=ismember(ids,severeIds); unweathered=ismember(ids,unweatheredIds); ordinary=~severe & ~unweathered;
+        x=raw(ix,:); severe=isSeverePoint(ix); unweathered=isUnweatheredPoint(ix); ordinary=isOrdinaryPoint(ix);
         if any(ordinary) && any(severe), rep(i,:)=mean(x(ordinary,:),1)/3+2*mean(x(severe,:),1)/3;
         elseif any(ordinary), rep(i,:)=mean(x(ordinary,:),1);
         elseif any(unweathered), rep(i,:)=mean(x(unweathered,:),1);
@@ -49,33 +52,26 @@ for i=1:height(T1)
 end
 rZ=clr(mreplace(closure(rep),delta));
 miss=ismissing(color) | strlength(strtrim(color))==0; assert(sum(miss)==4, 'Expected four missing colors.');
-filled=color; method=repmat("",height(T1),1); donors=repmat("",height(T1),1); distances=repmat("",height(T1),1); share=nan(height(T1),1);
-for i=find(miss)'
-    mask=~miss & typ==typ(i) & decor==decor(i) & all(isfinite(rZ),2); ix=find(mask);
-    d=sqrt(sum((rZ(ix,:)-rZ(i,:)).^2,2)); [d,o]=sort(d); ix=ix(o); take=min(5,numel(ix)); ix=ix(1:take); d=d(1:take); w=1./max(d,eps);
-    labs=color(ix); u=unique(labs,'sorted'); score=zeros(numel(u),1); for j=1:numel(u), score(j)=sum(w(labs==u(j))); end
-    [best,j]=max(score); share(i)=best/sum(score);
-    if share(i)>=.5, filled(i)=u(j); method(i)="hot-deck";
-    else
-        candidates=color(~miss & typ==typ(i)); uu=unique(candidates,'sorted'); count=zeros(numel(uu),1); for j=1:numel(uu), count(j)=sum(candidates==uu(j)); end
-        [~,j]=max(count); filled(i)=uu(j); method(i)="type-mode-fallback";
-    end
-    donors(i)=strjoin(aid(ix),','); distances(i)=strjoin(compose('%.8f',d),',');
-end
+[filled,method,donors,distances,share]=imputeColors(aid,decor,typ,color,miss,rZ);
+expectedIds=["19";"40";"48";"58"]; expectedColors=["黑";"浅蓝";"浅蓝";"浅蓝"];
+assert(all(filled(ismember(aid,expectedIds))==expectedColors), 'Color-imputation acceptance assertion failed.');
+assert(method(aid=="40")=="type-mode-fallback", 'Artifact 40 must use type-mode fallback.');
 
 % CLR-space robust diagnostics by glass type and binary point weathering.
 n=sum(valid); vtype=strings(n,1); bw=strings(n,1); pointTag=strings(n,1); vsid=sid(valid); vsname=sname(valid);
 for q=1:n
     a=find(aid==vsid(q),1); vtype(q)=typ(a);
-    if ismember(vsid(q),unweatheredIds), bw(q)="unweathered"; pointTag(q)="unweathered-point";
-    else
-        bw(q)=ternary(strlength(aw(a))==3,"unweathered","weathered");
-        pointTag(q)=ternary(ismember(vsid(q),severeIds),"severe-weathered-point","ordinary-point");
-    end
+    if contains(vsname(q),"未风化点"), bw(q)="unweathered"; pointTag(q)="unweathered-point";
+    elseif contains(vsname(q),"严重风化点"), bw(q)="weathered"; pointTag(q)="severe-weathered-point";
+    else, bw(q)=ternary(strlength(aw(a))==3,"unweathered","weathered"); pointTag(q)="ordinary-point"; end
 end
 [D,madT,iqrT,outlier]=diagnose(Z,vtype,bw); assert(~any(outlier), 'Unexpected additional robust outlier.');
-newOut=zeros(numel(deltas),1);
-for h=1:numel(deltas), [~,~,~,o]=diagnose(clr(mreplace(closed,deltas(h))),vtype,bw); newOut(h)=sum(o); end
+newOut=zeros(numel(deltas),1); sensColors=strings(numel(deltas),4); donorChanges=zeros(numel(deltas),1);
+for h=1:numel(deltas)
+    [~,~,~,o]=diagnose(clr(mreplace(closed,deltas(h))),vtype,bw); newOut(h)=sum(o);
+    [fh,~,dh]=imputeColors(aid,decor,typ,color,miss,clr(mreplace(closure(rep),deltas(h))));
+    sensColors(h,:)=fh(ismember(aid,expectedIds))'; donorChanges(h)=sum(dh(miss)~=donors(miss));
+end
 assert(all(newOut==0), 'Sensitivity assertion failed.');
 
 % Three raw snapshots and a key numerical snapshot for the R verification.
@@ -97,9 +93,7 @@ DG=table(vsname,vsid,vtype,pointTag,bw,D,madT,iqrT,outlier,VariableNames={'sampl
 PT=array2table([mu;sig],VariableNames=comp); PT=addvars(PT,["mean";"std"],Before=1,NewVariableNames='statistic'); writetable(PT,outFile,Sheet=cn('parameters'));
 UO=array2table(uraw,VariableNames=comp); UO=addvars(UO,uid,uw,us,Before=1,NewVariableNames={'artifact_id','weather','raw_sum'}); writetable(UO,outFile,Sheet=cn('unknown_raw'));
 writeStage(outFile,cn('unknown_closed'),uid,strings(height(T3),1),uclosed,comp); writeStage(outFile,cn('unknown_replace'),uid,strings(height(T3),1),ureplaced,comp); writeStage(outFile,cn('unknown_clr'),uid,strings(height(T3),1),uZ,comp); writeStage(outFile,cn('unknown_zclr'),uid,strings(height(T3),1),uzZ,comp);
-writetable(table(deltas',newOut,VariableNames={'delta_percent','new_robust_outliers'}),outFile,Sheet=cn('sensitivity'));
-
-makeFigures(ss,valid,vr,figDir);
+writetable(table(deltas',sensColors(:,1),sensColors(:,2),sensColors(:,3),sensColors(:,4),donorChanges,newOut,VariableNames={'delta_percent','color_19','color_40','color_48','color_58','donor_set_changes','new_robust_outliers'}),outFile,Sheet=cn('sensitivity'));
 fid=fopen(fullfile(dataDir,'matlab_preprocess_summary.txt'),'w');
 fprintf(fid,'MATLAB preprocessing: PASS\nArtifacts=58; raw points=69; valid points=67; unknown=8.\n');
 fprintf(fid,'Invalid chemistry: 15=79.47, 17=71.89. Undetected valid cells=%d (%.2f%%).\n',nonDetect,100*nonDetect/numel(vr));
@@ -112,6 +106,18 @@ Y=X; for r=1:size(X,1), z=X(r,:)==0; k=sum(z); if k>0, Y(r,z)=d; Y(r,~z)=X(r,~z)
 end
 function Z=clr(X), Z=log(X./geomean(X,2)); end
 function x=ternary(c,a,b), if c,x=a;else,x=b;end,end
+function [filled,method,donors,distances,share]=imputeColors(aid,decor,typ,color,miss,rZ)
+filled=color; method=repmat("",numel(aid),1); donors=repmat("",numel(aid),1); distances=repmat("",numel(aid),1); share=nan(numel(aid),1);
+for i=find(miss)'
+    mask=~miss & typ==typ(i) & decor==decor(i) & all(isfinite(rZ),2); ix=find(mask);
+    d=sqrt(sum((rZ(ix,:)-rZ(i,:)).^2,2)); [d,o]=sort(d); ix=ix(o); take=min(5,numel(ix)); ix=ix(1:take); d=d(1:take); w=1./max(d,eps);
+    labs=color(ix); u=unique(labs,'sorted'); score=zeros(numel(u),1); for j=1:numel(u), score(j)=sum(w(labs==u(j))); end
+    [best,j]=max(score); share(i)=best/sum(score);
+    if share(i)>=.5, filled(i)=u(j); method(i)="hot-deck";
+    else, candidates=color(~miss & typ==typ(i)); uu=unique(candidates,'sorted'); count=zeros(numel(uu),1); for j=1:numel(uu), count(j)=sum(candidates==uu(j)); end, [~,j]=max(count); filled(i)=uu(j); method(i)="type-mode-fallback"; end
+    donors(i)=strjoin(aid(ix),','); distances(i)=strjoin(compose('%.8f',d),',');
+end
+end
 function [D,mt,it,mark]=diagnose(Z,t,w)
 n=size(Z,1);D=nan(n,1);mt=nan(n,1);it=nan(n,1);mark=false(n,1);g=unique(t+"|"+w);
 for h=g', ix=(t+"|"+w)==h; c=median(Z(ix,:),1); D(ix)=sqrt(sum((Z(ix,:)-c).^2,2)); d=D(ix); m=median(d); mt(ix)=m+3.5*median(abs(d-m)); q=prctile(d,[25 75]); it(ix)=q(2)+1.5*(q(2)-q(1)); mark(ix)=d>mt(ix)&d>it(ix); end
@@ -129,10 +135,4 @@ case 'clr',s=char([67 76 82 21407 22987 20540]); case 'zclr',s=char([90 45 67 76
 case 'diagnostic',s=char([24322 24120 35786 26029]); case 'parameters',s=char([67 76 82 26631 20934 21270 21442 25968]);
 case 'unknown_raw',s=char([34920 21333 51 23545 24212 22788 29702 32467 26524]); case 'unknown_closed',s='U3_closed'; case 'unknown_replace',s='U3_replace'; case 'unknown_clr',s='U3_CLR'; case 'unknown_zclr',s='U3_ZCLR'; case 'sensitivity',s=char([36817 38646 21442 25968 25935 24863 24615]);
 end
-end
-function makeFigures(sums,valid,X,figDir)
-f=figure(Visible='off',Color='w',Position=[100 100 1200 430]);t=tiledlayout(f,1,2,TileSpacing='compact',Padding='compact');
-ax=nexttile(t);set(ax,Color='w',XColor='k',YColor='k',GridColor=[.7 .7 .7]);histogram(sums(valid),12,FaceColor=[.12 .42 .68]);hold on;histogram(sums(~valid),FaceColor=[.75 .3 .12]);xline(85,'--k');xline(105,'--k');title('Composition-sum validity',Color='k');xlabel('sum (%)',Color='k');ylabel('points',Color='k');legend('valid','invalid',TextColor='k',Color='w',Location='best');grid on;
-ax=nexttile(t);set(ax,Color='w',XColor='k',YColor='k',GridColor=[.7 .7 .7]);bar(100*sum(X==0,1)/size(X,1),FaceColor=[.12 .42 .68]);title('Non-detect rate by component',Color='k');xlabel('component',Color='k');ylabel('rate (%)',Color='k');grid on;exportgraphics(f,fullfile(figDir,'data_preprocess_diagnostics.pdf'),ContentType='image',Resolution=300,BackgroundColor='white');close(f);
-f=figure(Visible='off',Color='w',Position=[100 100 1200 300]);ax=axes(f,Color='w',XColor='k',YColor='k');axis(ax,[0 12 0 2]);axis(ax,'off');labels={'Read sheets','Validity screen','Closure','Zero replacement','CLR / Z-CLR','Outputs'};for q=1:6,x=.2+(q-1)*2;rectangle(ax,Position=[x .7 1.45 .55],Curvature=.08,FaceColor=[.9 .96 .93],EdgeColor=[.1 .35 .25],LineWidth=1);text(ax,x+.72,.97,labels{q},HorizontalAlignment='center',Color=[.05 .12 .08],FontWeight='bold');if q<6,text(ax,x+1.6,.97,'->',HorizontalAlignment='center',Color='k',FontWeight='bold');end,end;exportgraphics(f,fullfile(figDir,'data_preprocess_flow.pdf'),ContentType='image',Resolution=300,BackgroundColor='white');close(f);
 end

@@ -1,0 +1,4 @@
+Figure generation: PASS
+data_preprocess_diagnostics.pdf: vector cairo PDF
+data_preprocess_diagnostics.png: 300 dpi preview
+Input: data/verification_snapshots/sheet2_raw_snapshot.csv

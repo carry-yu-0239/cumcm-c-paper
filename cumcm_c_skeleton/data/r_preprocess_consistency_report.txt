@@ -1,5 +1,8 @@
-R independent preprocessing verification: PASS
+R direct-XLSX preprocessing verification: PASS
 Artifacts=58; raw points=69; valid=67; unknown=8.
-Invalid sums: 15=79.47; 17=71.89.
-Undetected valid cells=317 (33.80%); min positive=0.04%.
-Max MATLAB-R CLR difference=5.329e-15; replacement row-sum error=2.842e-14.
+Point labels: severe=3; unweathered=10; ordinary=56.
+Invalid sums: 15=79.47; 17=71.89; undetected valid cells=317.
+Colors: 19=黑; 40=浅蓝; 48=浅蓝; 58=浅蓝.
+Sensitivity colors [19/40/48/58]: 0.01%: 黑/深绿/浅蓝/浅蓝; 0.02%: 黑/浅蓝/浅蓝/浅蓝; 0.04%: 黑/浅蓝/浅蓝/浅蓝.
+Sensitivity donor-set changes=3,0,4; new robust outliers=0,0,0.
+Max direct-R to MATLAB CLR difference=5.329e-15.

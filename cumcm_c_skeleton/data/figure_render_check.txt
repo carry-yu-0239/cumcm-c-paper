@@ -1,0 +1,2 @@
+PDF rendering check: PASS
+data_preprocess_diagnostics.pdf: rendered 1285x620, nonblank bbox=(32, 35, 1268, 600)

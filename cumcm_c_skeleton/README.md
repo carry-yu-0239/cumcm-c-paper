@@ -21,6 +21,20 @@ latexmk -c
 - `code/`：完整可运行程序。
 - `data/`：清洗后的中间数据，题目原始附件无需重复放入支撑材料。
 
+## 数据预处理复现
+
+在已配置 MATLAB R2025b、R 4.6.1 和 Python 的环境中，按以下顺序执行：
+
+```bash
+cd cumcm_c_skeleton
+matlab -batch "run('code/preprocess.m')"
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" code/verify_preprocess.R
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" code/make_figures.R
+python code/verify_outputs.py
+```
+
+MATLAB 是唯一主计算源；R 从 `question/附件.xlsx` 独立读取并复算关键结果，图形脚本仅读取清洗CSV快照。流程图由 `sections/05_data.tex` 中的 TikZ 直接生成。
+
 ## 交稿前检查
 
 1. 删除所有“【待补：……】”提示。
