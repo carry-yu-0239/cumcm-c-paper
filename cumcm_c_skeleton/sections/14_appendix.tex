@@ -44,4 +44,4 @@
 \subsection{各问题求解程序}
 问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。
 
-问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。
+问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*\_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。
