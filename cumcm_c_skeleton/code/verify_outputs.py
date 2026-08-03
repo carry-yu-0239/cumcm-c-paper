@@ -45,6 +45,9 @@ figure_specs = {
     'problem2_kmeans_clusters.pdf': (1200, 650),
     'problem2_subclass_plsda.pdf': (1200, 650),
     'problem2_kmeans_sensitivity.pdf': (1200, 620),
+    'problem3_cv_diagnostics.pdf': (1200, 600),
+    'problem3_unknown_scores.pdf': (1200, 600),
+    'problem3_sensitivity.pdf': (1200, 600),
 }
 with TemporaryDirectory() as temp:
     temp_dir = Path(temp)

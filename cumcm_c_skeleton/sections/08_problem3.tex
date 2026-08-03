@@ -1,38 +1,128 @@
 \section{问题三：未知类别玻璃的鉴别}
+\label{sec:problem3}
 
-\subsection{未知样品预处理}
-对表单3执行与训练数据完全一致的有效性检验、零值替代、闭合归一化、变量变换和标准化。所有预处理参数仅由已分类训练样本估计，再应用于A1--A8，避免使用未知样品信息反向影响模型。
+\subsection{判别目标与模型链}
+问题三只对表单3的A1--A8判定玻璃大类，不将其继续赋入问题二得到的组成型亚类。
+这是因为题目要求的是未知文物所属的高钾或铅钡类型；问题二中的H1--H4、L1--L5是对已分类采样点的探索性组内划分，不应被误作未知文物的既定标签。
 
-\subsection{类别预测}
-将未知样品输入问题二选定的分类器，输出预测类别、类别概率或判别距离。
+未知样品沿用第\ref{sec:data}节已经固定的闭合、近零替换和CLR处理结果，训练集仍为67条有效采样点；A1--A8不参与任何训练参数的估计。
+主模型为问题二已通过按文物分组验证的14维CLR--PLS--DA，解释模型为PbO单节点决策树，紧凑对照模型只保留PbO、K$_2$O、BaO和SrO四个CLR坐标。
+三者的角色不同：主模型给出最终类型，对照模型检查结论是否依赖全部14种成分，决策树仅提供可审计的单变量解释规则。
 
-\begin{table}[H]
-  \centering
-  \caption{未知样品类别鉴别结果}
-  \label{tab:unknown-result}
-  \small
-  \begin{tabularx}{\textwidth}{C{1.2cm} C{2.2cm} C{2.2cm} Y C{2.0cm}}
-    \toprule
-    样品 & 风化状态 & 预测类型 & 属于铅钡的概率或判别得分 & 稳定性 \\
-    \midrule
-    A1 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A2 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A3 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A4 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A5 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A6 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A7 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    A8 & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        >=Latex,
+        every node/.style={font=\small, align=center},
+        input/.style={draw=black!55, fill=blue!7, rounded corners=2pt, minimum width=3.6cm, minimum height=.8cm},
+        model/.style={draw=black!60, fill=orange!10, rounded corners=2pt, text width=3.25cm, minimum height=1.0cm},
+        check/.style={draw=black!55, fill=green!8, rounded corners=2pt, text width=2.45cm, minimum height=.92cm},
+        output/.style={draw=black!65, fill=gray!10, rounded corners=2pt, text width=3.5cm, minimum height=.88cm},
+        flow/.style={->, line width=.55pt, draw=black!65}
+    ]
+        \node[input] (input) {A1--A8 的既有 U3\_CLR / U3\_ZCLR 输入\\不参与训练集参数估计};
+        \node[model, below=7mm of input] (main) {主模型：14维 CLR--PLS--DA\\沿用按文物分组验证锁定的 1 个潜变量};
+        \node[check, below left=9mm and 14mm of main] (tree) {解释：固定 PbO 单节点树\\给出可审计阈值规则};
+        \node[check, below right=9mm and 14mm of main] (compact) {对照：PbO、K$_2$O、BaO、SrO\\四维 CLR--PLS--DA};
+        \node[output, below=22mm of main] (agreement) {三模型交叉核对\\输出 A1--A8 的大类判别与主模型得分间隔};
+        \node[check, below=7mm of agreement] (sensitivity) {100次 CLR 局部扰动 + 三组近零参数重算\\检验判别结论是否翻转};
+        \draw[flow] (input) -- (main);
+        \draw[flow] (input.south west) |- (tree.north);
+        \draw[flow] (input.south east) |- (compact.north);
+        \draw[flow] (main) -- (agreement);
+        \draw[flow] (tree) |- (agreement.west);
+        \draw[flow] (compact) |- (agreement.east);
+        \draw[flow] (agreement) -- (sensitivity);
+    \end{tikzpicture}
+    \caption{未知类别玻璃大类鉴别的模型链与稳健性检验流程}
+    \label{fig:p3-workflow}
+\end{figure}
+
+将第$i$个训练点的14维CLR向量记为$\bm z_i$，类别以两列一热向量$\bm y_i$编码。
+PLS--DA依次提取同时解释$\bm Z$与$\bm Y$协方差的潜变量，写为
+\begin{equation}
+    \bm Z=\bm T\bm P^{\mathsf T}+\bm E_Z,\qquad
+    \bm Y=\bm T\bm Q^{\mathsf T}+\bm E_Y,
+    \label{eq:p3-plsda}
+\end{equation}
+并以
+\begin{equation}
+    \widehat{\bm y}_a=\overline{\bm y}+\widetilde{\bm z}_a\bm B,\qquad
+    \widehat T_a=\arg\max_{g\in\{1,2\}}\widehat y_{ag}
+    \label{eq:p3-prediction}
+\end{equation}
+得到未知样品$a$的两类判别得分和最终类型；其中$\widetilde{\bm z}_a$只用训练集均值和标准差标准化。
+由于PLS输出并非经概率校准，本文将$\widehat y_{a1},\widehat y_{a2}$称为\emph{判别得分}，并以
+\begin{equation}
+    M_a=\left|\widehat y_{a1}-\widehat y_{a2}\right|
+    \label{eq:p3-margin}
+\end{equation}
+描述样品到PLS判别边界的相对间隔。
+决策树严格读取问题二的固定规则：
+\begin{equation}
+    \operatorname{clr}(\mathrm{PbO})<1.7497\Rightarrow\text{高钾玻璃},
+    \qquad
+    \operatorname{clr}(\mathrm{PbO})\geq1.7497\Rightarrow\text{铅钡玻璃}.
+    \label{eq:p3-tree-rule}
+\end{equation}
+阈值作用于PbO相对于该点全部成分几何均值的对数比，而不是PbO的原始百分数。
+
+\subsection{模型复现与未知样品结果}
+主模型固定使用1个潜变量，不能因RMSEP较低的多潜变量设定而覆盖问题二已锁定的、泛化性能更优的选择。
+作为独立诊断，仍计算不同潜变量数的折外RMSEP；四变量对照模型在相同固定折上以平衡准确率优先、并列时取更少潜变量的规则选择1个潜变量。
+表\ref{tab:p3-cv}表明，主模型精确复现问题二的分组验证准确率0.9851、平衡准确率0.9722和宏平均F1为0.9807；四变量对照也达到相同的分类指标，说明主结论并不依赖低重要度成分的偶然波动。
+
+\input{data/problem3/problem3_cv_table.tex}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.94\textwidth]{figures/problem3_cv_diagnostics.pdf}
+    \caption{14维主模型与四维对照模型的分组交叉验证诊断}
+    \label{fig:p3-cv-diagnostics}
+\end{figure}
+
+图\ref{fig:p3-cv-diagnostics}左图显示，两种特征设定在1个潜变量时都达到平衡准确率0.9722；主模型的锁定依据是问题二的分组验证结果，而不是在本题中以更低RMSEP重新选择潜变量数。
+右图仅保留RMSEP随潜变量数变化的诊断信息，避免将误差最小化误作本题的模型选择规则。
+
+将A1--A8代入在全部67点上拟合的主模型，得到5件铅钡玻璃（A2、A3、A4、A5、A8）与3件高钾玻璃（A1、A6、A7）。
+表\ref{tab:p3-prediction}中，三种模型在8件未知样品上均给出一致结论；其中A5和A2的主模型得分间隔相对较小，故在后续敏感性分析中仍作为较接近判别边界的样品重点观察，而不以单一得分间隔另设未经验证的硬阈值。
+
+\input{data/problem3/problem3_prediction_table.tex}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.94\textwidth]{figures/problem3_unknown_scores.pdf}
+    \caption{未知样品的主模型判别得分及三模型结论一致性}
+    \label{fig:p3-unknown-scores}
+\end{figure}
+
+图\ref{fig:p3-unknown-scores}左图的线段长度为两类判别得分间隔，并非概率置信度；A5和A2的间隔较短，与表\ref{tab:p3-prediction}的重点样品标记一致。
+右图将主模型、四维对照和PbO树并列，8件样品均呈现3/3一致，说明最终分类未依赖某一种单独的判别表达。
 
 \subsection{分类敏感性分析}
-对每个未知样品的成分进行多次小幅扰动，并在每次扰动后重新执行完整预处理与分类。定义样品\(i\)的稳定率为
+首先对每个未知样品的CLR坐标独立加入均值为0、标准差为0.03的高斯扰动，并减去14维扰动均值以保持CLR零和约束。
+固定训练好的主模型，仅重新预测未知样品，进行$B=100$次重复。
+定义样品$a$的扰动稳定率为
 \begin{equation}
-  S_i=\frac{1}{B}\sum_{b=1}^{B}
-  I\!\left(\hat{T}_i^{(b)}=\hat{T}_i^{(0)}\right),
+    S_a^{(\varepsilon)}=\frac{1}{B}\sum_{b=1}^{B}
+    I\!\left(\widehat T_a^{(b)}=\widehat T_a^{(0)}\right).
+    \label{eq:p3-noise-stability}
 \end{equation}
-其中\(B\)为扰动次数。若\(S_i\)较低或预测概率接近阈值，则将该样品标记为边界样品，并重点讨论其不确定性。
+其次，回到原始快照，分别以$\delta=0.01\%,0.02\%,0.04\%$重新完成闭合、乘法近零替换和CLR变换；每个情景仍只用其训练集拟合1潜变量PLS--DA。
+以三种近零参数下与基准$\delta=0.02\%$结论一致的比例定义$S_a^{(\delta)}$。
 
-同时比较逻辑回归、LDA、决策树或SVM等候选模型对A1--A8的预测一致性。\todo{列出发生分歧的样品及原因。}
+表\ref{tab:p3-sensitivity}表明，8件样品在100次CLR局部扰动中均未发生主模型类别翻转，且在三种近零参数下的结论也完全一致。
+$\delta=0.02\%$重算CLR与既有基准输入的最大差异为$5.33\times10^{-15}$，说明敏感性模块准确复现了预处理口径。
+因此，本题给出的未知样品大类鉴别对所考察的检测量级扰动及近零替换取值均稳定。
+
+\input{data/problem3/problem3_sensitivity_table.tex}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.94\textwidth]{figures/problem3_sensitivity.pdf}
+    \caption{未知样品在局部扰动与近零参数变化下的分类稳定性}
+    \label{fig:p3-sensitivity}
+\end{figure}
+
+图\ref{fig:p3-sensitivity}进一步表明，A5在局部扰动后的最小得分间隔仍为0.221，是最接近边界但未翻转的样品；其余样品的最小间隔更大。
+两类敏感性检验全部保持100\%原判别结论，因而该稳定性结论来自逐样品的重复预测，而非仅由三模型基准结论一致推得。

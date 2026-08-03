@@ -1,0 +1,8 @@
+Problem 3 calculation: PASS
+Authoritative calculation: R script run_problem3.R.
+Unknown input: the existing U3_CLR/U3_ZCLR-derived CSV files passed the required export audit.
+Main 14-CLR PLS-DA reproduction: accuracy=0.9851; balanced accuracy=0.9722; macro-F1=0.9807.
+Compact four-CLR contrast selected 1 component(s), with grouped-CV balanced accuracy 0.9722.
+Unknown predictions: lead-barium=5; high-potassium=3; all three models agree for 8 of 8 samples.
+Sensitivity: 100 fixed-seed CLR perturbations per sample; 0.02% raw-snapshot CLR reconstruction maximum error=5.33e-15.
+No figures were generated in this run; figure production is intentionally deferred.

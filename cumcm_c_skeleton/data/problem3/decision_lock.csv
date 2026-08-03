@@ -1,0 +1,7 @@
+"decision_key","decision_value","source","status"
+"main_model","14-dimensional CLR PLS-DA","Problem 3 locked plan","locked"
+"main_ncomp","1","Problem 2 grouped CV","locked"
+"compact_model","PbO,K2O,BaO,SrO CLR PLS-DA contrast","Problem 3 locked plan","locked"
+"tree_role","explanatory only","Problem 2 tree rule","locked"
+"subclass_prediction","not performed","Problem statement scope","locked"
+"rmsep_role","diagnostic only","Problem 3 locked plan","locked"

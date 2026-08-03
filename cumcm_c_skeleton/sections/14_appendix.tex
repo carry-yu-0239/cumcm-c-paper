@@ -32,6 +32,13 @@
   17 & \texttt{data/problem2/} & 问题二输入审计、分类规则、验证指标、二维展示坐标、亚类清单、逆CLR中心、VIP、敏感性CSV及实际运行摘要 \\
   18 & \texttt{code/make\_problem2\_figures.R} & 问题二图形脚本：只读取\texttt{data/problem2/}的稳定CSV，生成中文矢量PDF和300 dpi PNG预览 \\
   19 & \texttt{figures/problem2\_*.pdf/.png} & 问题二的决策树、PLS--DA、聚类数诊断、K-means投影和敏感性图形 \\
+  20 & \texttt{code/export\_problem3\_inputs.m} & 仅读取预处理工作簿中既有的\texttt{U3\_CLR}和\texttt{U3\_ZCLR}，导出问题三未知样品输入，不重算预处理 \\
+  21 & \texttt{code/run\_problem3.R} & 问题三唯一数值计算入口：复现14维PLS--DA、拟合四变量对照、应用固定PbO树、预测A1--A8并完成两类敏感性检验 \\
+  22 & \texttt{code/make\_problem3\_tables.R} & 仅读取问题三稳定CSV，生成正文所需LaTeX表格，不重新估计模型 \\
+  23 & \texttt{code/make\_problem3\_figures.R} & 问题三图形脚本：只读取\texttt{data/problem3/}稳定CSV，生成中文矢量PDF和300 dpi PNG预览 \\
+  24 & \texttt{code/verify\_problem3\_outputs.R} & 检查问题三CSV、表格、图形文件、样品完整性和敏感性取值范围，不参与数值计算 \\
+  25 & \texttt{data/problem3/} & 问题三输入审计、固定决策、交叉验证与RMSEP诊断、未知样品判别、敏感性记录、图形生成报告、LaTeX表格及实际运行摘要 \\
+  26 & \texttt{figures/problem3\_*.pdf/.png} & 问题三的交叉验证诊断、未知样品判别得分与敏感性稳定性图形 \\
   \bottomrule
 \end{longtable}
 
@@ -45,3 +52,5 @@
 问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。
 
 问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*\_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。
+
+问题三的唯一数值计算入口为\texttt{code/run\_problem3.R}。它读取问题二固定的67点CLR矩阵、固定分组折和决策树规则，以及由\texttt{code/export\_problem3\_inputs.m}导出的表单3 CLR输入；复现主模型后生成未知样品类型、四变量对照、CLR局部扰动和近零参数敏感性CSV。\texttt{code/make\_problem3\_tables.R}只将稳定CSV排版为LaTeX表格；图形程序\texttt{code/make\_problem3\_figures.R}只读取\texttt{data/problem3/}稳定CSV，生成中文矢量PDF和300 dpi PNG预览，不重复估计模型。正文中的模型流程图由\texttt{sections/08\_problem3.tex}直接以TikZ绘制。

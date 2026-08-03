@@ -48,6 +48,23 @@ python code/verify_outputs.py
 
 数值结果写入 `data/problem2/`：其中包含分组交叉验证、决策树规则、PLS--DA得分与VIP、K-means亚类归属、二维展示坐标、CLR逆变换中心与敏感性记录。图形脚本生成 `figures/problem2_*.pdf/.png`，其中PDF为中文矢量图，PNG为300 dpi预览；`verify_outputs.py`会将PDF渲染后检查非空与尺寸。
 
+## 问题三复现
+
+问题三沿用问题二锁定的14维CLR--PLS--DA主模型（1个潜变量），并以PbO决策树和PbO、K$_2$O、BaO、SrO四变量PLS--DA作解释与对照。数值计算、表格排版、图形输出和结构验收彼此分离；图形脚本只读取稳定CSV，不重新估计模型。
+
+```bash
+cd cumcm_c_skeleton
+matlab -batch "run('code/export_problem3_inputs.m')"
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/run_problem3.R
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/make_problem3_tables.R
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/make_problem3_figures.R
+"C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/verify_problem3_outputs.R
+python code/verify_outputs.py
+```
+
+`data/problem3/run_summary.txt`记录实际运行状态；`unknown_predictions.csv`给出A1--A8的最终大类、两种对照和得分间隔；`sensitivity_runs.csv`、`sensitivity_summary.csv`记录CLR局部扰动和近零参数敏感性。若本机MATLAB许可证服务不可用，不能把上述MATLAB导出步骤表述为已执行；可使用已核验的既有导出输入继续进行R计算，并在交付记录中注明该环境限制。
+`code/make_problem3_figures.R`生成`figures/problem3_*.pdf/.png`：PDF为中文矢量图，PNG为300 dpi预览；问题三流程图直接由`sections/08_problem3.tex`中的TikZ生成，`verify_outputs.py`会渲染统计图PDF并检查非空与尺寸。
+
 ## 交稿前检查
 
 1. 删除所有“【待补：……】”提示。

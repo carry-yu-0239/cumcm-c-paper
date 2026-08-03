@@ -1,0 +1,4 @@
+Problem 3 input export: PASS (fallback)
+Source: existing U3_CLR and U3_ZCLR sheets in the preprocessing workbook.
+Rows=8; CLR variables=14; IDs=A1--A8; all values finite; every CLR row sum is below 1e-10.
+MATLAB exporter was not executed because the local MATLAB license service was unavailable; this fallback only reformatted existing approved workbook outputs and did not recompute preprocessing.

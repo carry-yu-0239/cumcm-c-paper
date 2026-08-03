@@ -11,3 +11,6 @@ problem2_kmeans_selection.pdf: rendered 1305x1143, nonblank bbox=(44, 22, 1290, 
 problem2_kmeans_clusters.pdf: rendered 1305x693, nonblank bbox=(50, 30, 1291, 655); problem2_kmeans_clusters.png: (2175, 1155) at 300.0 dpi
 problem2_subclass_plsda.pdf: rendered 1305x745, nonblank bbox=(46, 27, 1295, 719); problem2_subclass_plsda.png: (2175, 1245) at 300.0 dpi
 problem2_kmeans_sensitivity.pdf: rendered 1305x700, nonblank bbox=(65, 31, 1264, 671); problem2_kmeans_sensitivity.png: (2175, 1170) at 300.0 dpi
+problem3_cv_diagnostics.pdf: rendered 1305x693, nonblank bbox=(44, 33, 1298, 652); problem3_cv_diagnostics.png: (2175, 1155) at 300.0 dpi
+problem3_unknown_scores.pdf: rendered 1305x700, nonblank bbox=(63, 34, 1276, 660); problem3_unknown_scores.png: (2175, 1170) at 300.0 dpi
+problem3_sensitivity.pdf: rendered 1305x700, nonblank bbox=(48, 29, 1257, 660); problem3_sensitivity.png: (2175, 1170) at 300.0 dpi
