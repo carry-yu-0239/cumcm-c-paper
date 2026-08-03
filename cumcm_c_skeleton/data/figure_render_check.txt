@@ -1,2 +1,7 @@
 PDF rendering check: PASS
-data_preprocess_diagnostics.pdf: rendered 1285x620, nonblank bbox=(32, 35, 1268, 600)
+data_preprocess_diagnostics.pdf: rendered 1285x620, nonblank bbox=(32, 35, 1268, 600); data_preprocess_diagnostics.png: (2145, 1035) at 300.0 dpi
+problem1_association_rates.pdf: rendered 1330x638, nonblank bbox=(23, 22, 1324, 615); problem1_association_rates.png: (2220, 1065) at 300.0 dpi
+problem1_centers_dumbbell.pdf: rendered 1330x765, nonblank bbox=(33, 26, 1323, 727); problem1_centers_dumbbell.png: (2220, 1275) at 300.0 dpi
+problem1_change_sensitivity.pdf: rendered 1330x783, nonblank bbox=(42, 26, 1296, 747); problem1_change_sensitivity.png: (2220, 1305) at 300.0 dpi
+problem1_ternary_centers.pdf: rendered 1330x683, nonblank bbox=(118, 30, 1225, 531); problem1_ternary_centers.png: (2220, 1140) at 300.0 dpi
+problem1_paired_cases.pdf: rendered 1330x765, nonblank bbox=(36, 26, 1266, 727); problem1_paired_cases.png: (2220, 1275) at 300.0 dpi

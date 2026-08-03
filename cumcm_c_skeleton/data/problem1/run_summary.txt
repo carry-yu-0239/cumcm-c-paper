@@ -1,0 +1,7 @@
+Problem 1 calculation: PASS
+Input: supplied question/附件.xlsx; valid classified chemistry points=67; zero replacement delta=0.02%.
+Association primary colour scenario: hot-deck completed 58 artifacts; complete-case and type-mode analyses are sensitivity scenarios.
+Bayesian model: two glass types fitted separately; eta~N(0,3^2), log(phi)~N(log(30),2^2); 3 chains, 1,700 iterations, 700 warm-up, thin=2.
+Rhat range for monitored quantities: 1.020--4.896.
+This calculation script writes stable CSV inputs for the separate figure-only script code/make_problem1_figures.R; it does not draw figures itself.
+Important boundary: the 49/50 leave-one-artifact-out results are two case checks, not a generalization-error estimate.

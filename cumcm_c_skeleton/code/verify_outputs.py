@@ -32,9 +32,17 @@ bundled = shim.parents[2] / 'native' / 'poppler' / 'Library' / 'bin' / 'pdftoppm
 if bundled.is_file():
     renderer = str(bundled)
 checks = []
+figure_specs = {
+    'data_preprocess_diagnostics.pdf': (900, 350),
+    'problem1_association_rates.pdf': (1200, 500),
+    'problem1_centers_dumbbell.pdf': (1200, 600),
+    'problem1_change_sensitivity.pdf': (1200, 600),
+    'problem1_ternary_centers.pdf': (1200, 500),
+    'problem1_paired_cases.pdf': (1200, 600),
+}
 with TemporaryDirectory() as temp:
     temp_dir = Path(temp)
-    for name in ('data_preprocess_diagnostics.pdf',):
+    for name, (min_width, min_height) in figure_specs.items():
         path = ROOT / 'figures' / name
         if not path.is_file() or path.stat().st_size < 1024 or path.read_bytes()[:5] != b'%PDF-':
             raise AssertionError(f'Invalid PDF: {path}')
@@ -46,12 +54,21 @@ with TemporaryDirectory() as temp:
         if image_path is None:
             raise AssertionError(f'No raster preview produced for {name}.')
         image = Image.open(image_path).convert('RGB')
-        if image.width < 900 or image.height < 350:
+        if image.width < min_width or image.height < min_height:
             raise AssertionError(f'Unexpected rendered size for {name}: {image.size}')
         nonwhite = ImageChops.difference(image, Image.new('RGB', image.size, 'white')).getbbox()
         if nonwhite is None:
             raise AssertionError(f'Rendered figure is blank: {name}')
-        checks.append(f'{name}: rendered {image.width}x{image.height}, nonblank bbox={nonwhite}')
+        preview = ROOT / 'figures' / f'{path.stem}.png'
+        if not preview.is_file():
+            raise AssertionError(f'Missing 300 dpi PNG preview: {preview}')
+        preview_image = Image.open(preview)
+        if preview_image.width < min_width or preview_image.height < min_height:
+            raise AssertionError(f'Unexpected PNG size for {preview.name}: {preview_image.size}')
+        dpi = preview_image.info.get('dpi', (0, 0))
+        if min(dpi) < 299:
+            raise AssertionError(f'PNG preview is not 300 dpi: {preview.name}, dpi={dpi}')
+        checks.append(f'{name}: rendered {image.width}x{image.height}, nonblank bbox={nonwhite}; {preview.name}: {preview_image.size} at {dpi[0]:.1f} dpi')
 
 report = ROOT / 'data' / 'figure_render_check.txt'
 report.write_text('PDF rendering check: PASS\n' + '\n'.join(checks) + '\n', encoding='utf-8')

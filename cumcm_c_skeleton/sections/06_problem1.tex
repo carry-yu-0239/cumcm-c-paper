@@ -1,58 +1,198 @@
 \section{问题一：表面风化规律与风化前成分预测}
+\label{sec:problem1}
 
-\subsection{风化与玻璃类型、纹饰和颜色的关系}
+问题一包含两个层次：其一是在文物层判断类型、纹饰和颜色与整体表面风化是否有关；其二是在采样点层刻画同类玻璃的相对成分偏移，并据此给出风化点的风化前校正估计。二者的分析单位不同：前者使用58件文物的属性，后者使用67条有效采样点，文物编号仅用于属性关联、留出核验和避免重复抽样泄漏。
 
-\subsubsection{列联表与独立性检验}
-分别构造“风化状态—玻璃类型”“风化状态—纹饰”“风化状态—颜色”列联表。对于期望频数充分的列联表使用Pearson卡方检验；当存在较多小期望频数时，使用Fisher精确检验或Monte Carlo精确检验。
+图\ref{fig:p1-workflow}给出本题的数据和模型衔接。候选Dirichlet模型须先经收敛准入；未通过时只保留诊断，不进入恢复结果，因而最终图表均基于CLR稳健中心计算。
 
-设列联表观测频数为\(O_{ab}\)，期望频数为\(E_{ab}\)，卡方统计量为
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=5mm and 8mm,
+        pblock/.style={draw=blue!55!black, rounded corners=2pt, fill=blue!6, align=center, text width=3.2cm, minimum height=1.0cm, font=\small},
+        result/.style={draw=green!50!black, rounded corners=2pt, fill=green!7, align=center, text width=3.2cm, minimum height=1.0cm, font=\small},
+        warn/.style={draw=orange!80!black, rounded corners=2pt, fill=orange!10, align=center, text width=3.2cm, minimum height=1.0cm, font=\small},
+        arrow/.style={-{Latex[length=2mm]}, line width=.65pt, color=blue!55!black}
+    ]
+        \node[pblock] (input) {原始附件\\58件文物属性；67个有效采样点};
+        \node[pblock, below left=of input] (assoc) {文物层列联表\\卡方/精确检验与Cram\'er\'s $V$};
+        \node[pblock, below right=of input] (comp) {采样点层闭合与近零替代\\按玻璃类型、风化状态分层};
+        \node[result, below=of assoc] (assocresult) {属性关联结论\\类型有关；纹饰、颜色证据不足};
+        \node[warn, below=of comp] (candidate) {共享精度Dirichlet候选\\$\hat R$未通过准入};
+        \node[result, below=of candidate] (clr) {CLR稳健中心逆扰动\\32个风化点保守校正};
+        \node[result, below=of clr] (check) {49、50号整件留出\\案例级合理性核验};
+        \draw[arrow] (input) -- (assoc);
+        \draw[arrow] (input) -- (comp);
+        \draw[arrow] (assoc) -- (assocresult);
+        \draw[arrow] (comp) -- (candidate);
+        \draw[arrow] (candidate) -- (clr);
+        \draw[arrow] (clr) -- (check);
+    \end{tikzpicture}
+    \caption{问题一的分层分析与模型准入流程}
+    \label{fig:p1-workflow}
+\end{figure}
+
+\subsection{风化与文物属性的关联}
+
+对每个属性建立“属性类别$\times$整体表面风化”列联表。设观测频数和独立性下的期望频数分别为$O_{ab}$和$E_{ab}$，Pearson统计量为
 \begin{equation}
-  \chi^2=\sum_a\sum_b\frac{(O_{ab}-E_{ab})^2}{E_{ab}}.
+    \chi^2=\sum_a\sum_b\frac{(O_{ab}-E_{ab})^2}{E_{ab}}.
+    \label{eq:p1-chi-square}
 \end{equation}
-检验原假设为“两个类别变量相互独立”。同时报告Cramér's \(V\)作为效应量，避免只依据\(p\)值判断关系强弱。
-
-\subsubsection{二元逻辑回归}
-为同时控制多种属性，建立风化概率模型：
+当期望频数过小，使用Monte Carlo精确卡方检验而非渐近$p$值。关联强度同时以原始和小样本偏倚校正的Cram\'er\'s $V$报告；后者为
 \begin{equation}
-  \log\frac{P(W_i=1)}{1-P(W_i=1)}
-  =\beta_0+\beta_1T_i+\bm{\beta}_2^{\mathsf T}\bm{D}_{i,\mathrm{纹饰}}
-  +\bm{\beta}_3^{\mathsf T}\bm{D}_{i,\mathrm{颜色}},
+    V_{\mathrm{adj}}=
+    \sqrt{\frac{\max\{0,\chi^2/n-(r-1)(c-1)/(n-1)\}}
+    {\min\{r-(r-1)^2/(n-1)-1,\ c-(c-1)^2/(n-1)-1\}}}.
+    \label{eq:p1-cramers-v}
 \end{equation}
-其中分类变量采用哑变量编码。\todo{根据样本稀疏程度决定是否合并低频颜色，或采用Firth逻辑回归降低完全分离偏差。}
+这里$r,c$为列联表行、列数。为保留类别级的方向信息，将每个类别展开为0--1虚拟变量并计算其与风化指示变量的Spearman相关；不对无序颜色或纹饰强行赋予整数次序。
 
-\subsection{分类型的风化成分统计规律}
-分别在高钾玻璃和铅钡玻璃内部比较风化组与无风化组。对每种成分报告样本量、均值、标准差、中位数和四分位距。根据正态性、异常值及方差齐性检验选择独立样本\(t\)检验或Mann--Whitney \(U\)检验，并采用\todo{Benjamini--Hochberg等方法}控制14次重复检验的多重比较错误率。
+表\ref{tab:p1-association}显示，玻璃类型与表面风化存在统计关联：18件高钾玻璃中6件风化，而40件铅钡玻璃中28件风化；对应的Pearson检验$p=0.0087$，校正$V=0.321$。纹饰和颜色的精确检验均未发现显著关联。颜色结论在58件热卡填补主样本、54件完整案例和58件众数填补样本中保持一致，故不将4件填补颜色解释为实测证据，也不从颜色推断风化成因。
 
-定义第\(g\)类玻璃中成分\(j\)的风化变化比：
+\begin{table}[H]
+    \centering
+    \caption{文物属性与整体表面风化的关联检验}
+    \label{tab:p1-association}
+    \small
+    \begin{tabular}{llrrrr}
+        \toprule
+        属性 & 颜色情景 & $n$ & 检验方法 & $p$值 & $V/V_{\mathrm{adj}}$ \\
+        \midrule
+        玻璃类型 & 全部文物 & 58 & Pearson卡方 & 0.0087 & 0.344/0.321 \\
+        纹饰 & 全部文物 & 58 & Monte Carlo精确检验 & 0.1060 & 0.292/0.226 \\
+        颜色 & 热卡填补（主分析） & 58 & Monte Carlo精确检验 & 0.3805 & 0.365/0.102 \\
+        颜色 & 完整案例 & 54 & Monte Carlo精确检验 & 0.5804 & 0.341/0.000 \\
+        颜色 & 同类型众数填补 & 58 & Monte Carlo精确检验 & 0.4375 & 0.353/0.044 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/problem1_association_rates.pdf}
+    \caption{属性类别的整体风化率及Wilson 95\%区间；颜色采用热卡填补主情景，填补值仅用于完整化展示}
+    \label{fig:p1-association-rates}
+\end{figure}
+
+图\ref{fig:p1-association-rates}将列联表转换为可比较的风化率。铅钡玻璃的风化率为70\%，显著高于高钾玻璃的33\%；纹饰和颜色各类别的区间普遍较宽，特别是样本量很小的颜色类别，直观支持了“不据此作总体关联结论”的检验结果。
+
+\subsection{采样点状态与成分分析的分层}
+
+依照第\ref{sec:data}节的逐点判定规则，高钾玻璃含12个未风化点和6个一般风化点；铅钡玻璃含23个未风化点、23个一般风化点和3个严重风化点。主分析将严重风化点并入风化组，即以$W_{ir}^{(P)}\geq1$作为风化状态；3个严重风化点仍在输出表中单独标为外推对象。所有比例先闭合、以$\delta=0.02\%$作乘法近零替换，故下文的“升高”和“降低”均表示闭合比例意义的相对变化，并不等价于元素绝对质量的增减。
+
+\subsection{共享精度Dirichlet候选模型及其准入结果}
+
+为检验以概率成分模型刻画风化偏移的可行性，曾分别对两类玻璃拟合共享精度Dirichlet候选模型：
 \begin{equation}
-  q_{gj}=\frac{\operatorname{Med}(x_j\mid W=1,T=g)}
-  {\operatorname{Med}(x_j\mid W=0,T=g)}.
+    \mathbf c_{ir}^{+}\mid(T_i=t,W_{ir}^{(P)}=w)
+    \sim \operatorname{Dirichlet}(\phi_t\boldsymbol\mu_{tw}),
+    \qquad \sum_{j=1}^{14}\mu_{twj}=1.
+    \label{eq:p1-dirichlet}
 \end{equation}
-当\(q_{gj}>1\)时，表示该成分在比例意义上随风化相对升高；反之相对降低。需强调，该指标描述的是成分比例变化，而非元素绝对质量变化。
+其中$\boldsymbol\mu_{tw}$表示类型--风化状态的典型组成，$\phi_t$为同类型两状态共享的精度。用13维和为零的Softmax坐标参数化每个中心，并取弱信息先验$\eta_{twj}\sim N(0,3^2)$、$\log\phi_t\sim N(\log30,2^2)$；每个类型运行3条链，每链1700次迭代、前700次预热、每2次保留一次。
 
-\subsection{风化前化学成分预测模型}
+该候选模型\emph{未通过准入}。被监测量的$\hat R$范围为1.020--4.896，其中高钾组精度参数为4.896，远大于常用的1.05收敛判断线。因此，不能将其后验中心、可信区间或由其得到的32点恢复结果作为最终结论，也不报告未经收敛保证的Bayes因子或总体差异检验。该结果反映出高钾风化组仅6个点时，14维中心和精度难以由当前样本稳定识别；Dirichlet模型仅保留为后续扩充样本或改进采样器时的探索性框架。
 
-\subsubsection{基准比例恢复模型}
-若配对样本有限，可先依据同类型风化组和无风化组的稳健中心构造恢复因子：
+\subsection{CLR稳健中心逆扰动校正}
+
+在候选模型未获准入的情况下，采用不额外训练监督回归的CLR稳健中心逆扰动作为主恢复方法。对类型$t$和状态$w$，定义
 \begin{equation}
-  a_{gj}=\frac{\operatorname{Med}(x_j\mid W=0,T=g)}
-  {\operatorname{Med}(x_j\mid W=1,T=g)+\varepsilon},
+    \mathbf m_{tw}=\mathcal C\!\left\{
+        \exp\left[\operatorname{Med}_{(i,r):T_i=t,W_{ir}^{(P)}=w}
+        \operatorname{clr}(\mathbf c_{ir}^{+})\right]\right\},
+    \label{eq:p1-robust-center}
 \end{equation}
-并对风化点进行初步恢复：
+其中$\mathcal C(\cdot)$将向量闭合至100\%。对一个当前风化点，风化前校正估计为
 \begin{equation}
-  \tilde{x}_{ij}^{(0)}=a_{g j}x_{ij}^{(w)},\qquad
-  \hat{x}_{ij}^{(0)}=100\frac{\tilde{x}_{ij}^{(0)}}{\sum_k\tilde{x}_{ik}^{(0)}}.
+    \widehat{\mathbf x}_{ir}^{(0)}=
+    \mathcal C\!\left\{\mathbf c_{ir}^{+}\odot
+    \frac{\mathbf m_{t0}}{\mathbf m_{t1}}\right\}.
+    \label{eq:p1-clr-restore}
 \end{equation}
-其中\(\varepsilon\)用于避免分母为0。
+该式保留单点当前组成的相对结构，只逆转同类型群体的中位偏移；它是校正估计而非历史真实成分的精确复原。
 
-\subsubsection{候选回归模型}
-若可构造足够可靠的配对或近似配对样本，则比较以下方案：
-\begin{itemize}
-  \item 分成分稳健线性回归；
-  \item 偏最小二乘回归，缓解成分间共线性；
-  \item 简单树模型作为非线性对照，但限制深度以防过拟合。
-\end{itemize}
-模型以按文物分组的交叉验证误差、成分和约束满足度及解释性为选择标准。
+表\ref{tab:p1-centers}列出变化最有解释力的中心组成。高钾玻璃风化组中SiO$_2$的稳健中心由69.15\%升至94.64\%，而K$_2$O、CaO和Al$_2$O$_3$分别由10.84\%、5.99\%和6.99\%降至0.57\%、0.81\%和1.81\%。铅钡玻璃则表现为SiO$_2$由60.63\%降至26.49\%，PbO和P$_2$O$_5$由22.75\%、0.27\%升至47.50\%、5.37\%。这说明两类玻璃的风化相对迁移方向不同，故不能跨类型共享一个恢复因子。
 
-\subsection{结果与解释}
-\todo{填入风化关联检验表、关键成分变化表、风化前预测结果表和误差指标。解释时区分“统计显著”“效应大小”“化学意义”三个层次。}
+\begin{table}[H]
+    \centering
+    \caption{CLR稳健中心的主要相对成分变化（\(\delta=0.02\%\)）}
+    \label{tab:p1-centers}
+    \small
+    \begin{tabular}{llrrr}
+        \toprule
+        类型 & 成分 & 未风化中心（\%） & 风化中心（\%） & $\log(m_{t1}/m_{t0})$ \\
+        \midrule
+        高钾 & SiO$_2$ & 69.15 & 94.64 & 0.314 \\
+        高钾 & K$_2$O & 10.84 & 0.57 & -2.951 \\
+        高钾 & CaO & 5.99 & 0.81 & -2.000 \\
+        高钾 & Al$_2$O$_3$ & 6.99 & 1.81 & -1.349 \\
+        铅钡 & SiO$_2$ & 60.63 & 26.49 & -0.828 \\
+        铅钡 & CaO & 1.01 & 2.85 & 1.038 \\
+        铅钡 & PbO & 22.75 & 47.50 & 0.736 \\
+        铅钡 & P$_2$O$_5$ & 0.27 & 5.37 & 2.979 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/problem1_centers_dumbbell.pdf}
+    \caption{两类玻璃绝对对数变化最大的8个CLR稳健中心成分；空心点为未风化中心，实心点为风化中心}
+    \label{fig:p1-centers-dumbbell}
+\end{figure}
+
+图\ref{fig:p1-centers-dumbbell}与表\ref{tab:p1-centers}相互印证：高钾组的K$_2$O、CaO和Al$_2$O$_3$整体向低比例移动，而铅钡组中SiO$_2$降低、PbO和P$_2$O$_5$升高。哑铃图只用于展示稳健中心差异，不将低含量成分的点位解释为精确的物理迁移量。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.94\linewidth]{figures/problem1_ternary_centers.pdf}
+    \caption{关键三成分子组成中CLR稳健中心的风化方向；每个三元图内的三个成分重新闭合至100\%}
+    \label{fig:p1-ternary-centers}
+\end{figure}
+
+在图\ref{fig:p1-ternary-centers}的三成分子组成中，高钾中心沿“SiO$_2$增加、K$_2$O与CaO降低”的方向移动；铅钡中心则从SiO$_2$顶点方向转向PbO、P$_2$O$_5$方向。该图是子组成的几何展示，不能替代14维CLR分析。
+
+将$\delta$改为0.01\%和0.04\%，并删除3个铅钡严重风化点后，表\ref{tab:p1-centers}所列成分的变化方向不变；高钾组无严重风化点，因此该删除操作不改变其结果。图\ref{fig:p1-change-sensitivity}中，圆点为主设定$\delta=0.02\%$的对数变化，线段为三档$\delta$及“删除严重风化点”设定的结果范围，而非置信区间。主要成分均未跨越零线，说明结论不由近零替换或3个严重风化点单独驱动。该敏感性是CLR稳健基准的描述性核查，不替代未通过收敛检验的Dirichlet后验敏感性分析。32个风化点的14维校正结果（其中08、26、54号严重风化点标注为外推）已输出至支持材料\texttt{data/problem1/clr\_baseline\_restored\_points.csv}。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/problem1_change_sensitivity.pdf}
+    \caption{CLR稳健中心对数变化的敏感性范围；虚线为无相对变化，线段不是统计置信区间}
+    \label{fig:p1-change-sensitivity}
+\end{figure}
+
+\subsection{留出案例核验与结果边界}
+
+49、50号分别具有同文物的风化点和未风化点。对每个文物，先移除其全部采样点，再用其余同类型样本计算式\eqref{eq:p1-robust-center}--\eqref{eq:p1-clr-restore}；以Aitchison距离
+\begin{equation}
+    d_A(\mathbf a,\mathbf b)=\left\|\operatorname{clr}(\mathbf a)-\operatorname{clr}(\mathbf b)\right\|_2
+    \label{eq:p1-aitchison-distance}
+\end{equation}
+比较校正结果与实测未风化点。表\ref{tab:p1-paired-check}显示，逆扰动校正对两个案例均优于“直接取同类型未风化稳健中心”的基准，距离分别降低36.0\%和12.3\%。不过二者只是同一文物的不同位置，并非同一物理位置的风化前后重复测量；样本量也仅为2，故该核验只能说明校正具有案例级合理性，不能报告总体预测精度。
+
+\begin{table}[H]
+    \centering
+    \caption{49、50号整件文物留出核验的Aitchison距离}
+    \label{tab:p1-paired-check}
+    \small
+    \begin{tabular}{lrrr}
+        \toprule
+        留出文物 & CLR逆扰动校正 & 未风化中心基准 & 相对降低 \\
+        \midrule
+        49 & 2.928 & 4.578 & 36.0\% \\
+        50 & 4.070 & 4.641 & 12.3\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/problem1_paired_cases.pdf}
+    \caption{49、50号整件留出案例中主要成分的当前值、CLR校正值与实测未风化点；每个案例展示组成最大的8个成分}
+    \label{fig:p1-paired-cases}
+\end{figure}
+
+图\ref{fig:p1-paired-cases}表明，留出后CLR校正在两例中均能保留部分个体组成信息，并在关键成分上向实测未风化点移动；但个别成分仍有较大偏差。这与表\ref{tab:p1-paired-check}的距离改进一致，也再次说明两个案例只能提供合理性证据，不能外推为总体精度。
+
+综上，类型是与整体表面风化存在统计关联的文物属性，纹饰和颜色在本数据中尚无足够证据表明存在总体关联；两类玻璃的成分风化偏移明显不同。由于共享精度Dirichlet候选模型未收敛，本文以CLR稳健中心逆扰动提供32个风化点的保守校正结果，并将低含量成分、严重风化点和个体历史差异列为主要不确定性来源。

@@ -1,0 +1,5 @@
+"rule","status"
+"MCMC parameter estimation","failed: maximum monitored Rhat=4.896; do not use Dirichlet posterior for final recovery"
+"Direction sensitivity","partial: CLR baseline direction comparison only; no posterior sensitivity claim"
+"Paired case checks","not used for Dirichlet admission after failed chain mixing; CLR leave-one-artifact-out results are reported separately"
+"Covariance interpretation","not claimed: Dirichlet covariance restriction was not used for interpretation"

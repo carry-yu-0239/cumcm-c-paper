@@ -24,6 +24,10 @@
   9 & \texttt{figures/data\_preprocess\_diagnostics.pdf} & 中文矢量的成分和有效性与未检出率组合诊断图 \\
   10 & \texttt{figures/data\_preprocess\_diagnostics.png} & 组合诊断图的300 dpi预览图 \\
   11 & \texttt{data/*\_report.txt} & MATLAB、R、作图和PDF渲染的可复现运行报告 \\
+  12 & \texttt{code/run\_problem1.R} & 问题一唯一计算入口：直接读取原始XLSX，完成属性关联、Dirichlet候选拟合、CLR基准恢复和留出核验 \\
+  13 & \texttt{data/problem1/} & 问题一的关联检验、MCMC诊断、模型准入、CLR中心、32点恢复结果和留出核验CSV \\
+  14 & \texttt{code/make\_problem1\_figures.R} & 问题一图形脚本：只读取\texttt{data/problem1/}中的稳定CSV，输出中文矢量PDF和300 dpi PNG预览 \\
+  15 & \texttt{figures/problem1\_*.pdf/.png} & 问题一的属性风化率、稳健中心、敏感性、三元子组成与留出案例图形 \\
   \bottomrule
 \end{longtable}
 
@@ -34,4 +38,4 @@
 完整主程序源代码见\texttt{code/preprocess.m}；独立复核程序见\texttt{code/verify\_preprocess.R}；图形脚本见\texttt{code/make\_figures.R}；工作簿与图形渲染检查程序见\texttt{code/verify\_outputs.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
 
 \subsection{各问题求解程序}
-问题一至问题四的求解程序在其完成后另列入本表，并与相应的输入、输出和运行说明一并提交。
+问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。问题二至问题四的求解程序在其完成后另列入本表，并与相应的输入、输出和运行说明一并提交。
