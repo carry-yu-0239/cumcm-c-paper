@@ -1,52 +1,42 @@
-name: Temporary Source Archive
+name: Build LaTeX PDF
 
 on:
   push:
     branches:
-      - agent/problem4-figures
-    paths:
-      - .github/workflows/build-latex.yml
+      - main
+  pull_request:
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: latex-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  archive:
-    name: Package branch source
+  build:
+    name: Compile with XeLaTeX
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out source
         uses: actions/checkout@v6
 
-      - name: Create repository archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          archive_root="/tmp/cumcm-archive"
-          package_name="cumcm-c-paper-agent-problem4-figures"
-          rm -rf "$archive_root"
-          mkdir -p "$archive_root/$package_name"
-          rsync -a --exclude='.git' --exclude='.archive_run_id' ./ "$archive_root/$package_name/"
-          cd "$archive_root"
-          zip -qr "$GITHUB_WORKSPACE/$package_name.zip" "$package_name"
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          working_directory: cumcm_c_skeleton
+          texlive_version: 2026
+          os: debian
+          latexmk_use_xelatex: true
 
-      - name: Upload source archive
+      - name: Upload compiled PDF
         uses: actions/upload-artifact@v7
         with:
-          name: source-archive
-          path: cumcm-c-paper-agent-problem4-figures.zip
+          name: paper-pdf
+          path: cumcm_c_skeleton/main.pdf
           if-no-files-found: error
-          retention-days: 1
-
-      - name: Record workflow run id
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf '%s\n' "$GITHUB_RUN_ID" > .archive_run_id
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .archive_run_id
-          git commit -m "chore: record temporary archive run id [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          retention-days: 30
