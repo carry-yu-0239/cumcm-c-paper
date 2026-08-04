@@ -1,6 +1,6 @@
 \section{支持材料文件列表}
 
-依据竞赛格式规范，附录列明支持材料文件，并提交全部完整、可运行的源程序。数据预处理采用 MATLAB R2025b 主计算、R 4.6.1 从原始XLSX独立复核；Python 检查工作簿结构并将统计图PDF渲染为PNG进行非空与尺寸验收。
+依据竞赛格式规范，附录仅列出支撑材料组成及代码用途。完整、可运行源程序随支撑材料提交，不在论文附录中重复粘贴大段程序代码，以保证论文主体可读性。
 
 \begin{longtable}{C{1.2cm} L{5.2cm} L{7.0cm}}
   \caption{支持材料文件列表}\label{tab:support-files}\\
@@ -13,52 +13,24 @@
   序号 & 文件名 & 内容说明 \\
   \midrule
   \endhead
-  1 & \texttt{code/preprocess.m} & 唯一MATLAB主程序：有效性筛选、颜色填补、闭合、近零替换、CLR、异常诊断及数据输出 \\
-  2 & \texttt{code/verify\_preprocess.R} & R从原始XLSX独立读取并复算采样点状态、颜色填补、CLR、异常诊断与敏感性，再比对MATLAB CLR快照 \\
-  3 & \texttt{code/make\_figures.R} & 仅读取清洗后的CSV快照，生成中文矢量PDF及300 dpi预览PNG \\
-  4 & \texttt{code/verify\_outputs.py} & XLSX工作表结构检查及PDF渲染、尺寸、非空检查，不参与数值计算 \\
-  5 & \texttt{data/附件\_数据预处理结果.xlsx} & 清洗记录、颜色填补、CLR及异常诊断等完整中间数据 \\
-  6 & \texttt{data/verification\_snapshots/} & MATLAB读取原始工作簿后导出的三份CSV核验快照及关键结果快照 \\
-  7 & \texttt{data/matlab\_preprocess\_summary.txt} & MATLAB运行摘要与样本计数日志 \\
-  8 & \texttt{data/r\_preprocess\_consistency\_report.txt} & R与MATLAB数值一致性报告 \\
-  9 & \texttt{figures/data\_preprocess\_diagnostics.pdf} & 中文矢量的成分和有效性与未检出率组合诊断图 \\
-  10 & \texttt{figures/data\_preprocess\_diagnostics.png} & 组合诊断图的300 dpi预览图 \\
-  11 & \texttt{data/*\_report.txt} & MATLAB、R、作图和PDF渲染的可复现运行报告 \\
-  12 & \texttt{code/run\_problem1.R} & 问题一唯一计算入口：直接读取原始XLSX，完成属性关联、Dirichlet候选拟合、CLR基准恢复和留出核验 \\
-  13 & \texttt{data/problem1/} & 问题一的关联检验、MCMC诊断、模型准入、CLR中心、32点恢复结果和留出核验CSV \\
-  14 & \texttt{code/make\_problem1\_figures.R} & 问题一图形脚本：只读取\texttt{data/problem1/}中的稳定CSV，输出中文矢量PDF和300 dpi PNG预览 \\
-  15 & \texttt{figures/problem1\_*.pdf/.png} & 问题一的属性风化率、稳健中心、敏感性、三元子组成与留出案例图形 \\
-  16 & \texttt{code/run\_problem2.R} & 问题二唯一数值计算入口：按文物分组验证决策树和PLS--DA，并完成分类型K-means、VIP和敏感性计算 \\
-  17 & \texttt{data/problem2/} & 问题二输入审计、分类规则、验证指标、二维展示坐标、亚类清单、逆CLR中心、VIP、敏感性CSV及实际运行摘要 \\
-  18 & \texttt{code/make\_problem2\_figures.R} & 问题二图形脚本：只读取\texttt{data/problem2/}的稳定CSV，生成中文矢量PDF和300 dpi PNG预览 \\
-  19 & \texttt{figures/problem2\_*.pdf/.png} & 问题二的决策树、PLS--DA、聚类数诊断、K-means投影和敏感性图形 \\
-  20 & \texttt{code/export\_problem3\_inputs.m} & 仅读取预处理工作簿中既有的\texttt{U3\_CLR}和\texttt{U3\_ZCLR}，导出问题三未知样品输入，不重算预处理 \\
-  21 & \texttt{code/run\_problem3.R} & 问题三唯一数值计算入口：复现14维PLS--DA、拟合四变量对照、应用固定PbO树、预测A1--A8并完成两类敏感性检验 \\
-  22 & \texttt{code/make\_problem3\_tables.R} & 仅读取问题三稳定CSV，生成正文所需LaTeX表格，不重新估计模型 \\
-  23 & \texttt{code/make\_problem3\_figures.R} & 问题三图形脚本：只读取\texttt{data/problem3/}稳定CSV，生成中文矢量PDF和300 dpi PNG预览 \\
-  24 & \texttt{code/verify\_problem3\_outputs.R} & 检查问题三CSV、表格、图形文件、样品完整性和敏感性取值范围，不参与数值计算 \\
-  25 & \texttt{data/problem3/} & 问题三输入审计、固定决策、交叉验证与RMSEP诊断、未知样品判别、敏感性记录、图形生成报告、LaTeX表格及实际运行摘要 \\
-  26 & \texttt{figures/problem3\_*.pdf/.png} & 问题三的交叉验证诊断、未知样品判别得分与敏感性稳定性图形 \\
-  27 & \texttt{code/run\_problem4.R} & 问题四唯一数值计算入口：读取三份预处理核验快照，完成CLR相关、类型差异、配对Wilcoxon整体比较及按文物删除敏感性 \\
-  28 & \texttt{code/make\_problem4\_tables.R} & 仅读取问题四稳定CSV，生成正文与支撑材料所需LaTeX表格，不重新计算相关系数 \\
-  29 & \texttt{code/verify\_problem4\_outputs.R} & 检查问题四CSV、LaTeX表格、矩阵结构和数值范围，不重读原始输入或重算模型 \\
-  30 & \texttt{data/problem4/} & 问题四决策锁定、输入审计、检出率、相关矩阵、差异、稳健性、LaTeX表格及实际运行/验证报告 \\
-  31 & \texttt{code/make\_problem4\_figures.R} & 问题四图形程序：只读取稳定CSV，输出相关矩阵、差异和稳健性中文矢量PDF及300 dpi PNG预览 \\
-  32 & \texttt{figures/problem4\_*.pdf/.png} & 问题四的两类Pearson相关热力图、绝对差异热力图与稳健性图形 \\
+  \bottomrule
+  \endlastfoot
+  1 & \texttt{code/preprocess.m} & 数据有效性筛选、闭合、近零替换、CLR变换及预处理结果输出 \\
+  2 & \texttt{code/verify\_preprocess.R} & 独立复核预处理流程与关键数值结果 \\
+  3 & \texttt{code/make\_figures.R} & 根据稳定结果文件生成论文图形 \\
+  4 & \texttt{code/run\_problem1.R} & 问题一风化关联分析、成分恢复与敏感性计算 \\
+  5 & \texttt{code/run\_problem2.R} & 问题二分类模型、亚类划分及稳定性分析 \\
+  6 & \texttt{code/run\_problem3.R} & 问题三未知样品判别与敏感性分析 \\
+  7 & \texttt{code/run\_problem4.R} & 问题四CLR相关分析、类型差异比较及稳健性检验 \\
+  8 & \texttt{data/} & 预处理结果、各问题中间结果及核验文件 \\
+  9 & \texttt{figures/} & 正文使用的图形文件及高清预览文件 \\
   \bottomrule
 \end{longtable}
 
-\section{完整程序代码}
-电子论文附录中可根据篇幅列出核心代码，完整可运行代码必须随支持材料提交，且不得包含学校、姓名、学号、赛区等身份信息。
+\section{程序说明}
 
-\subsection{数据预处理程序}
-完整主程序源代码见\texttt{code/preprocess.m}；独立复核程序见\texttt{code/verify\_preprocess.R}；图形脚本见\texttt{code/make\_figures.R}；工作簿与图形渲染检查程序见\texttt{code/verify\_outputs.py}。源程序与结果工作簿共同提交，不在正文重复粘贴。
+本文程序采用模块化结构。数据预处理程序负责从原始工作簿生成统一的成分数据；各问题程序仅读取经过审核的稳定数据文件，完成对应模型计算；图形程序根据计算结果生成论文插图。完整源程序、运行环境说明和全部中间结果均随支撑材料提交。
 
-\subsection{各问题求解程序}
-问题一完整计算程序见\texttt{code/run\_problem1.R}，图形程序见\texttt{code/make\_problem1\_figures.R}。后者仅读取前者生成的稳定CSV，生成中文矢量PDF及300 dpi PNG预览，不重复读取原始工作簿或估计模型。该程序在共享精度Dirichlet候选模型的链混合未通过时，自动保留其诊断而不将不稳定后验作为结论，并通过\texttt{--baseline-only}仅复算CLR稳健中心逆扰动的最终恢复表。
+问题一程序对应风化属性关联、CLR稳健中心恢复和留出案例核验；问题二程序对应PbO规则、PLS--DA分类、K-means亚类划分及敏感性分析；问题三程序对应未知样品分类、模型一致性检查和扰动检验；问题四程序对应两类玻璃CLR相关结构计算、差异分析和稳健性评价。
 
-问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*\_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。
-
-问题三的唯一数值计算入口为\texttt{code/run\_problem3.R}。它读取问题二固定的67点CLR矩阵、固定分组折和决策树规则，以及由\texttt{code/export\_problem3\_inputs.m}导出的表单3 CLR输入；复现主模型后生成未知样品类型、四变量对照、CLR局部扰动和近零参数敏感性CSV。\texttt{code/make\_problem3\_tables.R}只将稳定CSV排版为LaTeX表格；图形程序\texttt{code/make\_problem3\_figures.R}只读取\texttt{data/problem3/}稳定CSV，生成中文矢量PDF和300 dpi PNG预览，不重复估计模型。正文中的模型流程图由\texttt{sections/08\_problem3.tex}直接以TikZ绘制。
-
-问题四的唯一数值计算入口为\texttt{code/run\_problem4.R}。它仅读取三份预处理核验快照中的67个有效采样点及14维CLR原始值，计算两类Pearson和Spearman相关矩阵、91组无序成分对的有方向/绝对差异、一次配对Wilcoxon符号秩整体比较，以及按文物完整删除的敏感性；不重跑预处理，也不纳入表单3。\texttt{code/make\_problem4\_tables.R}只将稳定CSV排版为LaTeX表格；\texttt{code/make\_problem4\_figures.R}只读取稳定CSV，输出中文矢量PDF及300 dpi PNG预览；\texttt{code/verify\_problem4\_outputs.R}检查结构与数值范围，\texttt{code/verify\_outputs.py}渲染PDF检查图形非空、尺寸与分辨率。完整输出与实际运行记录位于\texttt{data/problem4/}。
+为避免附录影响论文阅读，本文不在此处展开粘贴数百行源代码。支撑材料中的程序文件可直接运行，并与论文中的数据处理流程、模型结果和图表输出保持对应。
