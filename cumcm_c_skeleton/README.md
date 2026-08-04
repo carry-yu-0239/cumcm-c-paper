@@ -65,6 +65,21 @@ python code/verify_outputs.py
 `data/problem3/run_summary.txt`记录实际运行状态；`unknown_predictions.csv`给出A1--A8的最终大类、两种对照和得分间隔；`sensitivity_runs.csv`、`sensitivity_summary.csv`记录CLR局部扰动和近零参数敏感性。若本机MATLAB许可证服务不可用，不能把上述MATLAB导出步骤表述为已执行；可使用已核验的既有导出输入继续进行R计算，并在交付记录中注明该环境限制。
 `code/make_problem3_figures.R`生成`figures/problem3_*.pdf/.png`：PDF为中文矢量图，PNG为300 dpi预览；问题三流程图直接由`sections/08_problem3.tex`中的TikZ生成，`verify_outputs.py`会渲染统计图PDF并检查非空与尺寸。
 
+## 问题四复现
+
+问题四以67个有效采样点为单位，直接读取三份预处理核验快照中的14维CLR原始值；高钾18点、铅钡49点。run_problem4.R是唯一数值计算入口，依次输出检出率、Pearson与Spearman相关矩阵、91组关联差异、一次配对Wilcoxon整体比较和按文物完整删除的LOAO敏感性。它不重跑预处理、不读取未知样品，也不产生单对显著性结论。make_problem4_figures.R仅读取稳定CSV，输出中文矢量PDF及300 dpi PNG预览。
+
+运行顺序如下：
+
+    cd cumcm_c_skeleton
+    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/run_problem4.R
+    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/make_problem4_tables.R
+    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/make_problem4_figures.R
+    "C:/Program Files/R/R-4.6.1/bin/Rscript.exe" --encoding=UTF-8 code/verify_problem4_outputs.R
+    python code/verify_outputs.py
+
+data/problem4/保存稳定CSV、自动生成的LaTeX表格和实际运行/验证报告；figures/problem4_*.pdf/.png保存四幅问题四图形。verify_problem4_outputs.R仅检查CSV、表格和数值范围；verify_outputs.py渲染PDF并检查预览PNG的非空、尺寸及300 dpi，不重算模型。
+
 ## 交稿前检查
 
 1. 删除所有“【待补：……】”提示。

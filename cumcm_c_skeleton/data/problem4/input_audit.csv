@@ -1,0 +1,12 @@
+"item","value"
+"artifact_records",58
+"raw_sampling_points",69
+"valid_sampling_points",67
+"valid_artifacts",56
+"clr_fields",14
+"raw_component_fields",14
+"high_potassium_points",18
+"lead_barium_points",49
+"retained_robust_outliers",0
+"invalid_artifacts_in_clr",0
+"max_abs_clr_row_sum",3.99125177352744e-14

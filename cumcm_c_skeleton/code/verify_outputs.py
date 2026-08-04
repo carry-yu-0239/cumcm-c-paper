@@ -48,6 +48,10 @@ figure_specs = {
     'problem3_cv_diagnostics.pdf': (1200, 600),
     'problem3_unknown_scores.pdf': (1200, 600),
     'problem3_sensitivity.pdf': (1200, 600),
+    'problem4_high_potassium_pearson.pdf': (1400, 1250),
+    'problem4_lead_barium_pearson.pdf': (1400, 1250),
+    'problem4_difference_heatmap.pdf': (1400, 1250),
+    'problem4_robustness.pdf': (1400, 650),
 }
 with TemporaryDirectory() as temp:
     temp_dir = Path(temp)

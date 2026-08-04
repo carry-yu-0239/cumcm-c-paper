@@ -1,0 +1,6 @@
+Problem 4 output verification: PASS
+Validated stable CSV and LaTeX-table structure only; no raw-input reread and no model recomputation occurred.
+Matrices: four 14x14 correlation matrices plus signed and absolute difference matrices.
+Pairs: 91 unique upper-triangular pairs; Wilcoxon: one paired whole-structure comparison.
+LOAO summaries=182; high-potassium artifact removals=16; lead-barium artifact removals=40.
+Problem 4 figure files are required here; PDF rendering, PNG size, and 300 dpi checks are delegated to code/verify_outputs.py.

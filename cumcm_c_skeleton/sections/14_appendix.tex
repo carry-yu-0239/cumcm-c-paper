@@ -39,6 +39,12 @@
   24 & \texttt{code/verify\_problem3\_outputs.R} & 检查问题三CSV、表格、图形文件、样品完整性和敏感性取值范围，不参与数值计算 \\
   25 & \texttt{data/problem3/} & 问题三输入审计、固定决策、交叉验证与RMSEP诊断、未知样品判别、敏感性记录、图形生成报告、LaTeX表格及实际运行摘要 \\
   26 & \texttt{figures/problem3\_*.pdf/.png} & 问题三的交叉验证诊断、未知样品判别得分与敏感性稳定性图形 \\
+  27 & \texttt{code/run\_problem4.R} & 问题四唯一数值计算入口：读取三份预处理核验快照，完成CLR相关、类型差异、配对Wilcoxon整体比较及按文物删除敏感性 \\
+  28 & \texttt{code/make\_problem4\_tables.R} & 仅读取问题四稳定CSV，生成正文与支撑材料所需LaTeX表格，不重新计算相关系数 \\
+  29 & \texttt{code/verify\_problem4\_outputs.R} & 检查问题四CSV、LaTeX表格、矩阵结构和数值范围，不重读原始输入或重算模型 \\
+  30 & \texttt{data/problem4/} & 问题四决策锁定、输入审计、检出率、相关矩阵、差异、稳健性、LaTeX表格及实际运行/验证报告 \\
+  31 & \texttt{code/make\_problem4\_figures.R} & 问题四图形程序：只读取稳定CSV，输出相关矩阵、差异和稳健性中文矢量PDF及300 dpi PNG预览 \\
+  32 & \texttt{figures/problem4\_*.pdf/.png} & 问题四的两类Pearson相关热力图、绝对差异热力图与稳健性图形 \\
   \bottomrule
 \end{longtable}
 
@@ -54,3 +60,5 @@
 问题二的唯一数值计算入口为\texttt{code/run\_problem2.R}。它读取预处理主程序产生的67点CLR核验快照，完成按文物分组的决策树和PLS--DA验证、分类型K-means、逆CLR中心、VIP、敏感性与展示坐标输出；不重新实施预处理，也不生成图形。完整数值结果位于\texttt{data/problem2/}，其中\texttt{run\_summary.txt}记录实际运行状态，\texttt{*\_subclass\_assignments.csv}列出全部采样点亚类归属。图形程序\texttt{code/make\_problem2\_figures.R}只能读取该目录中的稳定CSV，生成问题二中文矢量PDF及300 dpi PNG预览。
 
 问题三的唯一数值计算入口为\texttt{code/run\_problem3.R}。它读取问题二固定的67点CLR矩阵、固定分组折和决策树规则，以及由\texttt{code/export\_problem3\_inputs.m}导出的表单3 CLR输入；复现主模型后生成未知样品类型、四变量对照、CLR局部扰动和近零参数敏感性CSV。\texttt{code/make\_problem3\_tables.R}只将稳定CSV排版为LaTeX表格；图形程序\texttt{code/make\_problem3\_figures.R}只读取\texttt{data/problem3/}稳定CSV，生成中文矢量PDF和300 dpi PNG预览，不重复估计模型。正文中的模型流程图由\texttt{sections/08\_problem3.tex}直接以TikZ绘制。
+
+问题四的唯一数值计算入口为\texttt{code/run\_problem4.R}。它仅读取三份预处理核验快照中的67个有效采样点及14维CLR原始值，计算两类Pearson和Spearman相关矩阵、91组无序成分对的有方向/绝对差异、一次配对Wilcoxon符号秩整体比较，以及按文物完整删除的敏感性；不重跑预处理，也不纳入表单3。\texttt{code/make\_problem4\_tables.R}只将稳定CSV排版为LaTeX表格；\texttt{code/make\_problem4\_figures.R}只读取稳定CSV，输出中文矢量PDF及300 dpi PNG预览；\texttt{code/verify\_problem4\_outputs.R}检查结构与数值范围，\texttt{code/verify\_outputs.py}渲染PDF检查图形非空、尺寸与分辨率。完整输出与实际运行记录位于\texttt{data/problem4/}。
