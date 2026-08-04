@@ -1,0 +1,3 @@
+"glass_type","n_component_pairs","pearson_spearman_sign_agreement","mean_absolute_pearson_spearman_gap","median_absolute_pearson_spearman_gap","artifact_removals","median_loao_sign_stability","minimum_loao_sign_stability"
+"高钾",91,0.747252747252747,0.169112512453123,0.129626310048346,16,1,0.4375
+"铅钡",91,0.802197802197802,0.131308104293497,0.0805186962886354,40,1,0.475

@@ -1,0 +1,2 @@
+"test_name","n_component_pairs","paired","statistic","p_value","estimated_location_shift","confidence_low","confidence_high","alternative","interpretation_scope"
+"paired_wilcoxon_signed_rank",91,TRUE,2049,0.863304741237347,-0.00701883693144505,-0.092380672590028,0.0808473473420744,"two.sided","探索性整体比较；91个相关系数并非独立观测，不对单个成分对作显著性结论"

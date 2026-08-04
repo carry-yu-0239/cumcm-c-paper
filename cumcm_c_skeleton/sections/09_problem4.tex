@@ -1,39 +1,105 @@
 \section{问题四：化学成分关联关系及类别差异}
+\label{sec:problem4}
 
-\subsection{成分数据的闭合效应}
-由于14种成分之和接近\(100\%\)，一个成分比例上升会被动压缩其他成分比例，直接相关分析可能产生伪相关。因此，在零值替代和闭合归一化后，优先使用中心化对数比变换：
-\begin{equation}
-  \operatorname{clr}(c_{ij})
-  =\ln\frac{c_{ij}}{g(\bm{c}_i)},\qquad
-  g(\bm{c}_i)=\left(\prod_{j=1}^{D}c_{ij}\right)^{1/D}.
-\end{equation}
+\subsection{关联分析口径}
 
-\subsection{分类型关联分析}
-分别对高钾玻璃和铅钡玻璃计算CLR变量之间的Pearson相关系数，并以Spearman相关系数作为稳健性对照。对检出率极低或近零方差成分不进行强行解释。
+表单2的每一行代表一个采样点，同一文物可含多个采样点；因此本问以采样点为分析单位，文物编号只用于连接玻璃类型及后续成组删除检验。继承第\ref{sec:data}节的有效性筛选后，15、17号化学成分记录不进入本问，得到67个有效采样点，其中高钾18个、铅钡49个。表单3未知样品不参与相关计算。
+
+14种氧化物比例受总和约束，若直接在原始百分比上计算相关性，某一成分的被动压缩可能造成伪关联。故本问直接读取预处理阶段已经生成的14维CLR原始值\(z_{irj}\)（见式\eqref{eq:clr}），不再插补、删除异常点或进行Z-score处理。Z-score对Pearson和Spearman相关的数值不产生影响，且会模糊本问与预处理结果之间的可追溯关系。
 
 \begin{figure}[H]
-  \centering
-  \begin{subfigure}{0.47\textwidth}
     \centering
-    \fbox{\parbox[c][5.0cm][c]{0.9\linewidth}{\centering\todo{高钾玻璃相关热力图}}}
-    \caption{高钾玻璃}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}{0.47\textwidth}
-    \centering
-    \fbox{\parbox[c][5.0cm][c]{0.9\linewidth}{\centering\todo{铅钡玻璃相关热力图}}}
-    \caption{铅钡玻璃}
-  \end{subfigure}
-  \caption{不同玻璃类型的成分关联结构}
-  \label{fig:corr-heatmap}
+    \begin{tikzpicture}[
+        node distance=9mm and 14mm,
+        every node/.style={draw, rounded corners=2pt, align=center, minimum height=10mm, font=\small},
+        flow/.style={-{Latex[length=2.2mm]}, thick, draw=#5F7F98}
+    ]
+        \node[fill=blue!8, minimum width=37mm] (input) {67个有效采样点\\14维CLR原始值};
+        \node[fill=green!10, below left=of input, minimum width=34mm] (high) {高钾玻璃\\18个采样点};
+        \node[fill=orange!10, below right=of input, minimum width=34mm] (lead) {铅钡玻璃\\49个采样点};
+        \node[fill=gray!10, below=of high, minimum width=34mm] (pairs) {Pearson主分析\\Spearman对照};
+        \node[fill=gray!10, below=of lead, minimum width=34mm] (compare) {91组成分对差异\\Wilcoxon与LOAO};
+        \draw[flow] (input) -- (high);
+        \draw[flow] (input) -- (lead);
+        \draw[flow] (high) -- (pairs);
+        \draw[flow] (lead) -- (compare);
+        \draw[flow] (pairs) -- (compare);
+    \end{tikzpicture}
+    \caption{问题四的CLR关联分析与稳健性检验流程}
+    \label{fig:p4-workflow}
 \end{figure}
 
-\subsection{两类玻璃关联差异比较}
-对每对成分\((j,k)\)，定义相关差异
+对玻璃类型\(t\in\{\mathrm{K},\mathrm{PB}\}\)，以该类型内的全部\(n_t\)个采样点计算Pearson相关系数：
 \begin{equation}
-  \Delta r_{jk}=r_{jk}^{(\mathrm{高钾})}-r_{jk}^{(\mathrm{铅钡})}.
+    r_{jk}^{(t)}
+    =
+    \frac{\sum_{i=1}^{n_t}\left(z_{ij}^{(t)}-\bar z_j^{(t)}\right)
+    \left(z_{ik}^{(t)}-\bar z_k^{(t)}\right)}
+    {\sqrt{\sum_{i=1}^{n_t}\left(z_{ij}^{(t)}-\bar z_j^{(t)}\right)^2}
+    \sqrt{\sum_{i=1}^{n_t}\left(z_{ik}^{(t)}-\bar z_k^{(t)}\right)^2}}.
+    \label{eq:p4-pearson}
 \end{equation}
-通过Fisher \(z\)变换或自助法构造差异置信区间，筛选在两类玻璃中方向相反或强度差异显著的成分对。重点报告少量稳定且具有配方或风化解释的关联，而不是机械罗列全部\(91\)组成分对。
+CLR坐标具有零和线性约束，故相关矩阵秩不足是其几何性质，而非需要求逆或修正的数值错误。对于\(j<k\)的91组无序成分对，按\(|r_{jk}^{(t)}|\)将关联强度划为强（不小于0.8）、中等（0.5至0.8）和弱（小于0.5）；此划分仅用于描述排序，不作为显著性阈值。
 
-\subsection{结果解释}
-\todo{总结两类玻璃最强的正、负关联；列出差异最大的成分对；结合助熔剂、稳定剂及风化过程解释差异，同时明确相关关系不等于因果关系。}
+原始快照还用于计算检出率。14种成分均保留在相关计算中，不因检出率低而事后删去；但高钾组的Na$_2$O、PbO、BaO、SrO、SnO$_2$和SO$_2$，以及铅钡组的Na$_2$O、K$_2$O、SnO$_2$和SO$_2$检出率低于50\%，其相关解释均须谨慎。
+
+\subsection{分类型关联结构}
+
+两类玻璃均未出现绝对Pearson相关系数不小于0.8的成分对，最强关联均为中等强度。表\ref{tab:p4-high-correlations}由稳定CSV自动排版，列出各类型绝对相关系数最大的成分对。高钾玻璃中，PbO--SO$_2$、Fe$_2$O$_3$--SnO$_2$和CaO--SrO呈较强的负向关联，系数分别为\(-0.701\)、\(-0.697\)和\(-0.694\)；SrO--SnO$_2$及SiO$_2$--SnO$_2$呈中等正向关联。铅钡玻璃中，Na$_2$O--P$_2$O$_5$的负相关最强（\(-0.656\)），CuO--SnO$_2$、MgO--SO$_2$和MgO--BaO也为中等负相关，而SiO$_2$--Al$_2$O$_3$为中等正相关。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/problem4_high_potassium_pearson.pdf}
+    \caption{高钾玻璃14维CLR Pearson相关矩阵；色阶固定为\([-1,1]\)}
+    \label{fig:p4-high-pearson}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/problem4_lead_barium_pearson.pdf}
+    \caption{铅钡玻璃14维CLR Pearson相关矩阵；色阶固定为\([-1,1]\)}
+    \label{fig:p4-lead-pearson}
+\end{figure}
+
+\input{data/problem4/problem4_high_correlations_table}
+
+这些关联描述的是同类型样本中CLR坐标的共同变动，并不等同于氧化物之间存在直接化学反应或因果作用。尤其是低检出率成分经近零替换后仍保留在CLR空间，个别中等关联应结合检出率、样本量和文物来源共同解读。
+
+\subsection{两类玻璃的关联差异}
+
+对每一成分对定义有方向差异及绝对差异：
+\begin{equation}
+    \Delta r_{jk}=r_{jk}^{(\mathrm{K})}-r_{jk}^{(\mathrm{PB})},
+    \qquad
+    A_{jk}=|\Delta r_{jk}|.
+    \label{eq:p4-difference}
+\end{equation}
+表\ref{tab:p4-differences}列出绝对差异最大的10组。Fe$_2$O$_3$--CuO的差异最大：高钾组为正相关0.557，铅钡组为负相关\(-0.497\)，绝对差异为1.054。Fe$_2$O$_3$--SnO$_2$、BaO--SO$_2$、SiO$_2$--SrO和CaO--SrO也出现方向反转或明显减弱，说明两类玻璃在若干成分配伍上的共同变动模式并不相同。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/problem4_difference_heatmap.pdf}
+    \caption{高钾与铅钡玻璃Pearson相关系数的绝对差异；色阶固定为\([0,2]\)}
+    \label{fig:p4-difference}
+\end{figure}
+
+\input{data/problem4/problem4_difference_table}
+
+为避免将91组相关系数逐对误作独立样本，按完全相同的成分对顺序，将两类Pearson系数进行一次配对Wilcoxon符号秩检验。表\ref{tab:p4-global-test}的\(p=0.8633\)，位置差估计接近零，未显示两类相关结构存在系统性的整体偏移。由于这91个相关系数相互依赖，该检验仅是探索性的整体比较；它既不否定表\ref{tab:p4-differences}中的描述性差异，也不产生任何单个成分对的\(p\)值或显著性结论。
+
+\input{data/problem4/problem4_global_test_table}
+
+\subsection{稳健性与结论边界}
+
+以Spearman相关作为秩稳健性对照，高钾与铅钡组的Pearson--Spearman符号一致率分别为74.7\%和80.2\%，平均绝对差分别为0.169和0.131。进一步以文物为单位实施leave-one-artifact-out：每次同时删除该文物的全部采样点，而不删除单点。两类玻璃的91组关联中位符号稳定率均为100\%，但最低稳定率分别为43.8\%和47.5\%，表明少数边缘关联会受单件文物影响。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/problem4_robustness.pdf}
+    \caption{问题四的秩相关对照与按文物删除稳健性；每个点对应一组无序成分对}
+    \label{fig:p4-robustness}
+\end{figure}
+
+\input{data/problem4/problem4_robustness_table}
+
+综上，问题四给出的是以CLR为基础的分类型关联画像：两类玻璃没有统一的极强关联结构，整体相关结构的探索性比较亦未见系统性偏移；但Fe$_2$O$_3$--CuO等少数成分对存在明显的类型间差异。结论受高钾样本较少、重复采样及低检出率成分影响，应作为配方和风化差异的筛查证据，而非因果判定。
